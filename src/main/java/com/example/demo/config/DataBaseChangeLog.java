@@ -2,14 +2,12 @@ package com.example.demo.config;
 import java.util.Arrays;
 import java.util.List;
 
-import com.example.demo.model.ExpenseCategory;
+import com.example.demo.model.*;
 import io.mongock.api.annotations.*;
 import io.mongock.api.annotations.ChangeUnit;
 import org.springframework.data.mongodb.core.MongoTemplate;
 
-import com.example.demo.model.Expense;
-import com.example.demo.model.Order;
-@ChangeUnit(id="DataBaseChangeLog", order = "001", author = "mongock")
+@ChangeUnit(id="migration_new", order = "002", author = "mongock")
     public class DataBaseChangeLog {
 
 
@@ -21,28 +19,41 @@ import com.example.demo.model.Order;
         this.mongoTemplate = mongoTemplate;
     }
 
-    public List<String> tables = Arrays.asList("expense", "category", "guest", "order", "order_item", "product");
+    public List<String> tables = Arrays.asList("expense", "category", "guest", "order", "order_items", "product");
 
     @BeforeExecution
     public void before() {
+//        mongoTemplate.createCollection("category");
         tables.forEach(mongoTemplate::createCollection);
     }
 
     @Execution
     public void migrationMethod() {
+        //extract seed
         List<Expense> expenses = getExpense();
-        expenses.forEach(expense -> mongoTemplate.save(expense, "expense"));
+        List<Category> categories = Category.seedCategory();
+        List<Product> products = Product.seedProduct();
+        List<OrderItem> orderItems = OrderItem.seedOrder();
         List<Order> orders = Order.seedOrder();
+
+        //data seeding
+        expenses.forEach(expense -> mongoTemplate.save(expense, "expense"));
+        categories.forEach(category -> mongoTemplate.save(category, "category"));
+        products.forEach(product -> mongoTemplate.save(product, "product"));
+        orderItems.forEach(order_item -> mongoTemplate.save(order_item, "order_items"));
+        orders.forEach(order -> mongoTemplate.save(order, "order"));
     }
 
     @RollbackBeforeExecution
     public void rollbackBefore() {
+//        mongoTemplate.dropCollection("expense");
         tables.forEach(mongoTemplate::dropCollection);
     }
 
     @RollbackExecution
     public void rollback() {
         tables.forEach(mongoTemplate::remove);
+//        tables.forEach(mongoTemplate::deleteMany);
     }
 
      /** This is the method with the migration code **/

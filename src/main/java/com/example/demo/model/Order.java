@@ -1,6 +1,7 @@
 package com.example.demo.model;
 
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
@@ -23,6 +24,10 @@ public class Order {
 //    @DBRef
     private Collection<String> orderItemsIds;
 
+//    @Transient
+    private List<OrderItem> orderItems;
+
+
     public String getId() {
         return id;
     }
@@ -35,12 +40,24 @@ public class Order {
         return orderStatus;
     }
 
-    public Collection<String> getOrderItems() {
+    public Collection<String> getOrderItemsIds() {
         return orderItemsIds;
+    }
+
+    public List<OrderItem> getOrderItems() {
+        return orderItems;
     }
 
     public void setId(String id) {
         this.id = id;
+    }
+
+    public void setOrderItemsIds(Collection<String> orderItemsIds) {
+        this.orderItemsIds = orderItemsIds;
+    }
+
+    public void setOrderItems(List<OrderItem> orderItems) {
+        this.orderItems = orderItems;
     }
 
     public void setTableNo(String tableNo) {
@@ -51,8 +68,8 @@ public class Order {
         this.orderStatus = orderStatus;
     }
 
-    public void setOrderItems(Collection<String> orderItems) {
-        this.orderItemsIds = orderItems;
+    public Order(){
+
     }
 
     public Order(String id, String tableNo, OrderStatus orderStatus, Collection<String> orderItemsIds) {
