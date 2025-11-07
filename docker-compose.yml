@@ -1,0 +1,25 @@
+# version: '3.8'
+services:
+  db:
+    image: mongo:latest
+    ports:
+      - '27017:27017'
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: 1234
+      MONGO_INITDB_DATABASE: U_CAFE
+    volumes:
+      - db:/data/db
+      - ./mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
+
+  api:
+    build:
+      context: .
+      dockerfile: dockerfile
+    ports: 
+      - "9001:8080"
+
+volumes:
+  db:
+    driver:
+      local
