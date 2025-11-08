@@ -1,5 +1,5 @@
 package com.example.demo.controllers;
-import com.example.demo.dto.orderDTO;
+import com.example.demo.dto.order.orderDTO;
 
 import com.example.demo.repository.OrderRepository;
 import com.example.demo.services.OrderService;
@@ -17,6 +17,9 @@ public class OrderController {
         this.orderService = orderService;
         this.orderRepository = orderRepository;
     }
+
+    @PostMapping()
+    public PostEntity
 
     @GetMapping()
     @ResponseBody

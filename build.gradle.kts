@@ -10,7 +10,7 @@ description = "Demo project for Spring Boot"
 
 java {
 	toolchain {
-		languageVersion = JavaLanguageVersion.of(17)
+		languageVersion = JavaLanguageVersion.of(21)
 	}
 }
 
@@ -32,6 +32,11 @@ dependencies {
 	testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 
+tasks.bootRun {
+    mainClass.set("com.example.demo.PosApplication")
+}
+
 tasks.withType<Test> {
 	useJUnitPlatform()
 }
+	

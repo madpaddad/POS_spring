@@ -3,7 +3,7 @@ package com.example.demo.services;
 import com.example.demo.repository.OrderRepository;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import com.example.demo.dto.orderDTO;
+import com.example.demo.dto.order.orderDTO;
 
 import java.util.List;
 import java.util.Optional;
