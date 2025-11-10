@@ -1,4 +1,4 @@
-package com.example.demo.dto;
+package com.example.demo.dto.order;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;

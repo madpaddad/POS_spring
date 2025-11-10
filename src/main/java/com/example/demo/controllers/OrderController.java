@@ -18,8 +18,8 @@ public class OrderController {
         this.orderRepository = orderRepository;
     }
 
-    @PostMapping()
-    public PostEntity
+//    @PostMapping()
+//    public PostEntity
 
     @GetMapping()
     @ResponseBody

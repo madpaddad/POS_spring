@@ -32,6 +32,8 @@ dependencies {
 	testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 
+
+// Boot Run application with visual code on Linux
 tasks.bootRun {
     mainClass.set("com.example.demo.PosApplication")
 }
