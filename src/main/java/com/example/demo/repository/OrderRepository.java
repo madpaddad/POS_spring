@@ -7,32 +7,13 @@ import org.springframework.data.mongodb.repository.config.EnableMongoRepositorie
 
 import java.util.List;
 import java.util.Optional;
-import com.example.demo.dto.orderDTO;
+import com.example.demo.dto.order.orderDTO;
 
 //import java.util.List;
 
 @EnableMongoRepositories()
 public interface OrderRepository extends MongoRepository<Order, String> {
-//    @Aggregation(pipeline = {
-//            "{ $match: { _id: ?1 } }",
-//            "{ $lookup: { from: 'order_items', localField: 'orderItemsIds', foreignField: '_id', as: 'orderItems' } }"
-//    })
-//    Optional<Order> findOrderById(String id);
-//        @Aggregation(pipeline = {
-//                "{ $match: { _id: ?0 } }",
-//                "{ $lookup: { " +
-//                        "from: 'order_items', " +
-//                        "localField: 'orderItemsIds', " +
-//                        "foreignField: '_id', " +
-//                        "as: 'orderItems' " +
-//                        "} }",
-//                "{ $lookup: { " +
-//                        "from: 'product', " +
-//                        "localField: 'orderItems.product_id', " +
-//                        "foreignField: '_id', " +
-//                        "as: 'product'" +
-//                "} }",
-//        })
+
         @Aggregation(pipeline = {
                 "{ $match: { _id: ?0 } }",
                 "{ $lookup: { from: 'order_items', localField: 'orderItemsIds', foreignField: '_id', as: 'orderItems' } }",
@@ -41,11 +22,5 @@ public interface OrderRepository extends MongoRepository<Order, String> {
                 "{ $group: { _id: '$_id', tableNo: { $first: '$tableNo' }, orderStatus: { $first: '$orderStatus' }, orderItems: { $push: '$orderItems' } } }"
         })
         orderDTO findOrderById(String id);
-//    Optional List<OrderItem> orderItems;
 
-
-//    @Aggregation(pipeline = {
-//            "{$match:  {id}}",
-//            "{$lookup:  {from:  'order_items', localField:  'id'} }"
-//    })
 }
