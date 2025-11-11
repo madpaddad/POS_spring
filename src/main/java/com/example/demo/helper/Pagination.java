@@ -1,4 +1,4 @@
-package com.example.demo.Helper.repository;
+package com.example.demo.helper;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

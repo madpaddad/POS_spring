@@ -2,6 +2,7 @@ package com.example.demo.controllers;
 
 
 import com.example.demo.dto.order.ProductDTO;
+import com.example.demo.helper.ApiResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.http.ResponseEntity;
@@ -17,10 +18,8 @@ public class ProductController {
 
 
     private final ProductService productService;
-//    private final OrderRepository orderRepository;
     public ProductController(ProductService productService) {
         this.productService = productService;
-//        this.orderRepository = orderRepository;
     }
 
 
@@ -28,5 +27,14 @@ public class ProductController {
     @ResponseBody
     public  ResponseEntity<List<Product>> getProduct(@RequestParam(required = false) String category_id){
         return this.productService.get(category_id);
+    }
+
+    @PostMapping("/create")
+    @ResponseBody
+    public ResponseEntity<ApiResponse<Product>> createStudent(@RequestBody Product product) {
+//        Product savedproduct = product;
+//        ApiResponse<Product> apiResponse = ApiResponse.success(product, "hello");
+//        return ResponseEntity.ok(apiResponse);
+        return this.productService.create(product);
     }
 }

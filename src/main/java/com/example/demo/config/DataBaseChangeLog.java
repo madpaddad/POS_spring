@@ -7,7 +7,7 @@ import io.mongock.api.annotations.*;
 import io.mongock.api.annotations.ChangeUnit;
 import org.springframework.data.mongodb.core.MongoTemplate;
 
-@ChangeUnit(id="migration_new", order = "002", author = "mongock")
+@ChangeUnit(id="category", order = "002", author = "mongock")
     public class DataBaseChangeLog {
 
 
