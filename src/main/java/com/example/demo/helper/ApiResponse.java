@@ -13,7 +13,7 @@ public class ApiResponse<T> {
         return res;
     }
 
-    public static <T> ApiResponse<T> error(String message) {
+    public static <T> ApiResponse<T> error(String message, Exception e) {
         ApiResponse<T> res = new ApiResponse<>();
         res.success = false;
         res.message = message;

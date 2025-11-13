@@ -25,16 +25,25 @@ public class ProductController {
 
     @GetMapping()
     @ResponseBody
-    public  ResponseEntity<List<Product>> getProduct(@RequestParam(required = false) String category_id){
+    public  ResponseEntity<List<Product>> get(@RequestParam(required = false) String category_id){
         return this.productService.get(category_id);
     }
 
     @PostMapping("/create")
     @ResponseBody
-    public ResponseEntity<ApiResponse<Product>> createStudent(@RequestBody Product product) {
-//        Product savedproduct = product;
-//        ApiResponse<Product> apiResponse = ApiResponse.success(product, "hello");
-//        return ResponseEntity.ok(apiResponse);
+    public ResponseEntity<ApiResponse<Product>> create(@RequestBody Product product) {
         return this.productService.create(product);
+    }
+
+    @PutMapping()
+    @ResponseBody
+    public ResponseEntity<ApiResponse<ProductDTO>> update(@RequestParam(required = true) String id,@RequestBody ProductDTO product){
+        return this.productService.update(id, product);
+    }
+
+    @DeleteMapping()
+    @ResponseBody
+    public ResponseEntity<ApiResponse<String>> delete(@RequestParam(required = true) String id){
+        return this.productService.delete(id);
     }
 }

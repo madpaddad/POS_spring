@@ -7,11 +7,14 @@ package com.example.demo.dto.order;
 public class ProductDTO {
     private String id;
     private String name;
-    private String category_id;
+//    private String category_id;
+    private String category;
     private Double price;
 
-    public ProductDTO(){
-
+    public ProductDTO(String name, String category, Double price){
+        this.name = name;
+        this.category = category;
+        this.price = price;
     }
     public String getId() {
         return id;
@@ -29,19 +32,19 @@ public class ProductDTO {
         this.name = name;
     }
 
-    public String getCategory_id() {
-        return category_id;
-    }
-
-    public void setCategory_id(String category_id) {
-        this.category_id = category_id;
-    }
-
     public Double getPrice() {
         return price;
     }
 
     public void setPrice(Double price) {
         this.price = price;
+    }
+
+    public String getCategory() {
+        return category;
+    }
+
+    public void setCategory(String category) {
+        this.category = category;
     }
 }

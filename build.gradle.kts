@@ -25,6 +25,8 @@ dependencies {
 	implementation("io.mongock:mongock-springboot-v3:5.4.1")
     implementation("io.mongock:mongock-springboot-v3")
     implementation("io.mongock:mongodb-springdata-v4-driver")
+    implementation("org.mapstruct:mapstruct:1.5.5.Final")
+    annotationProcessor("org.mapstruct:mapstruct-processor:1.5.5.Final")
 //	implementation("org.springframework.boot:spring-boot-starter-security")
 //	implementation("org.springframework.boot:spring-boot-starter-data-redis")
     implementation("org.springframework.boot:spring-boot-starter-actuator")

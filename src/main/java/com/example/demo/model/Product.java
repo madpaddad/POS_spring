@@ -23,7 +23,7 @@ public class Product {
     private String name;
 
     @Field
-    private String category_name;
+    private String category;
 
     @Field
     private double price;
@@ -37,12 +37,12 @@ public class Product {
     }
 
     public String getCategory_id() {
-        return category_name;
+        return category;
     }
 
-    public void setCategory_id(String category_id) {
-        this.category_name = category_id;
-    }
+//    public void setCategory(String category) {
+//        this.category = category;
+//    }
 
     public double getPrice() {
         return price;
@@ -61,11 +61,11 @@ public class Product {
     }
 
     public String getCategory() {
-        return category_name;
+        return category;
     }
 
     public void setCategory(String category) {
-        this.category_name = category;
+        this.category = category;
     }
 
     public Product(){}
@@ -73,14 +73,14 @@ public class Product {
     public Product(String id, String name, String category, double price) {
         this.id = id;
         this.name = name;
-        this.category_name = category;
+        this.category = category;
         this.price = price;
     }
 
     public Product(String name, String category, double price) {
 //        this.id = id;
         this.name = name;
-        this.category_name = category;
+        this.category = category;
         this.price = price;
     }
 
