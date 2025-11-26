@@ -15,7 +15,6 @@ public interface ProductRepository extends MongoRepository<Product, String>{
 
     @Query("{ 'category_id' : ?0 }")
     List<Product> findByCategoryIdCustom(String categoryId);
-
 //    @Aggregation(pipeline= {
 //        "{ $lookup: { from : 'product', localField: 'id', 'foreignField: '_id', as: 'id'} }",
 //    })

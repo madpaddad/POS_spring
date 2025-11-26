@@ -9,4 +9,5 @@ import org.mapstruct.NullValuePropertyMappingStrategy;
 
 @Mapper(componentModel = "spring", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
 public interface ProductMapper extends CustomerMapper<ProductDTO, Product>{
+    Product toEntity(ProductDTO dto);
 }

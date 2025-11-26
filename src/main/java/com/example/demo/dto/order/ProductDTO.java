@@ -1,21 +1,36 @@
 package com.example.demo.dto.order;
 
+import com.example.demo.model.Product;
 
-//import org.springframework.data.mongodb.core.mapping.Document;
+import java.util.Map;
 
-//@Document
 public class ProductDTO {
     private String id;
     private String name;
-//    private String category_id;
     private String category;
     private Double price;
+    private boolean has_subproduct;
+    private Map<String, Integer> sub_product;
 
-    public ProductDTO(String name, String category, Double price){
+    public ProductDTO() {
+    }
+
+    // Constructor for normal product (no sub-products)
+    public ProductDTO(String name, String category, Double price) {
         this.name = name;
         this.category = category;
         this.price = price;
+        this.has_subproduct = false;
     }
+
+    // Constructor for product WITH sub-products
+    public ProductDTO(String name, String category, Map<String, Integer> sub_product) {
+        this.name = name;
+        this.category = category;
+        this.sub_product = sub_product;
+        this.has_subproduct = true;
+    }
+
     public String getId() {
         return id;
     }
@@ -46,5 +61,21 @@ public class ProductDTO {
 
     public void setCategory(String category) {
         this.category = category;
+    }
+
+    public boolean ishas_subproducts() {
+        return has_subproduct;
+    }
+
+    public void sethas_subproducts(boolean has_subproducts) {
+        this.has_subproduct = has_subproducts;
+    }
+
+    public Map<String, Integer> getSub_products() {
+        return sub_product;
+    }
+
+    public void setSub_products(Map<String, Integer> sub_products) {
+        this.sub_product = sub_products;
     }
 }

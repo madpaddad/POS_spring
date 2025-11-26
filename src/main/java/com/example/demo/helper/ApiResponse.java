@@ -3,6 +3,7 @@ package com.example.demo.helper;
 public class ApiResponse<T> {
     private boolean success;
     private String message;
+    private String e_message;
     private T data;
 
     public static <T> ApiResponse<T> success(T data, String message) {
@@ -17,6 +18,7 @@ public class ApiResponse<T> {
         ApiResponse<T> res = new ApiResponse<>();
         res.success = false;
         res.message = message;
+        res.e_message = e.getMessage();
         return res;
     }
 

@@ -5,65 +5,85 @@ import java.util.List;
 import com.example.demo.model.*;
 import io.mongock.api.annotations.*;
 import io.mongock.api.annotations.ChangeUnit;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
-@ChangeUnit(id="category", order = "002", author = "mongock")
+@ChangeUnit(id="seed users", order = "002", author = "mongock")
     public class DataBaseChangeLog {
 
+    private final PasswordEncoder passwordEncoder;
 
+//    @Autowired
+//    private PasswordEncoder passwordEncoder;
     private final MongoTemplate mongoTemplate;
 
-    private static final String CLIENTS_COLLECTION_NAME = "clients";
 
-    public DataBaseChangeLog(MongoTemplate mongoTemplate) {
+    public DataBaseChangeLog(MongoTemplate mongoTemplate, PasswordEncoder passwordEncoder) {
         this.mongoTemplate = mongoTemplate;
+        this.passwordEncoder = passwordEncoder;
     }
 
-    public List<String> tables = Arrays.asList("expense", "category", "guest", "order", "order_items", "product");
+    public List<String> tables = Arrays.asList("expense", "category", "guest", "order", "order_items", "product", "user");
 
     @BeforeExecution
     public void before() {
-//        mongoTemplate.createCollection("category");
-        tables.forEach(mongoTemplate::createCollection);
+        mongoTemplate.createCollection(Category.class);
+        mongoTemplate.createCollection(User.class);
+        mongoTemplate.createCollection(Product.class);
+        mongoTemplate.createCollection(Category.class);
+        mongoTemplate.createCollection(OrderItem.class);
+        mongoTemplate.createCollection(Order.class);
     }
+
 
     @Execution
     public void migrationMethod() {
         //extract seed
-        List<Expense> expenses = getExpense();
         List<Category> categories = Category.seedCategory();
         List<Product> products = Product.seedProduct();
         List<OrderItem> orderItems = OrderItem.seedOrder();
         List<Order> orders = Order.seedOrder();
-
+        List<User> users = User.seedUser(passwordEncoder);
         //data seeding
-        expenses.forEach(expense -> mongoTemplate.save(expense, "expense"));
         categories.forEach(category -> mongoTemplate.save(category, "category"));
         products.forEach(product -> mongoTemplate.save(product, "product"));
         orderItems.forEach(order_item -> mongoTemplate.save(order_item, "order_items"));
         orders.forEach(order -> mongoTemplate.save(order, "order"));
+        users.forEach((user -> mongoTemplate.save(user, "user")));
+
     }
 
     @RollbackBeforeExecution
     public void rollbackBefore() {
 //        mongoTemplate.dropCollection("expense");
         tables.forEach(mongoTemplate::dropCollection);
+        mongoTemplate.dropCollection(User.class);
+        mongoTemplate.dropCollection(Product.class);
+        mongoTemplate.dropCollection(Category.class);
+        mongoTemplate.dropCollection(OrderItem.class);
+        mongoTemplate.dropCollection(Order.class);
     }
 
     @RollbackExecution
     public void rollback() {
-        tables.forEach(mongoTemplate::remove);
+        mongoTemplate.remove(User.class);
+        mongoTemplate.remove(Product.class);
+        mongoTemplate.remove(Category.class);
+        mongoTemplate.remove(OrderItem.class);
+        mongoTemplate.remove(Order.class);
 //        tables.forEach(mongoTemplate::deleteMany);
     }
 
      /** This is the method with the migration code **/
 
-     private List<Expense> getExpense() {
-         return Arrays.asList(
-                 new Expense(2000, ExpenseCategory.FOOD, "alice","1"),
-                 new Expense(9000, ExpenseCategory.UTILITIES, "bob", "2")
-         );
-     }
+//     private List<Expense> getExpense() {
+//         return Arrays.asList(
+//                 new Expense(2000, ExpenseCategory.FOOD, "alice","1"),
+//                 new Expense(9000, ExpenseCategory.UTILITIES, "bob", "2")
+//         );
+//     }
      /**
       This method is mandatory even when transactions are enabled.
       They are used in the undo operation and any other scenario where transactions are not an option.

@@ -60,26 +60,33 @@ public class ProductService {
      Create Product
      ***********************************************************************/
 
-    public ResponseEntity<ApiResponse<Product>> create(Product product) {
+    public ResponseEntity<ApiResponse<ProductDTO>> create(ProductDTO product) {
 
         try {
 
             // Check if a category name exist before insert
             if(!categoryRepository.existsByName(product.getCategory())){
-                logger.info(product.getCategory());
+//                logger.info(product.getCategory());
                 throw new IllegalArgumentException("មិនមានប្រភេទទិន្នន័យ");
             }
 
-            Product savedproduct = productRepository.save(product);
+            if (product.ishas_subproducts()) {
+                if (product.getSub_products() == null){
+                    throw new IllegalArgumentException("មិនមានទិន្នន័យគ្រប់គ្រាន់ដើម្បីបញ្ចូល");
+                }
+            }
+            // Check for sub product and boolean
 
-            ApiResponse<Product> response = ApiResponse.success(savedproduct, "ផលិតផលបង្កើតបានជោគជ័យ");
+            Product savedproduct = productRepository.save(mapper.toEntity(product));
+
+            ApiResponse<ProductDTO> response = ApiResponse.success(product, "ផលិតផលបង្កើតបានជោគជ័យ");
             return ResponseEntity.ok(response);
 
         } catch (Exception e){
 //            logger.error(e);
             e.printStackTrace();
-            logger.error("Error found", e);
-            ApiResponse<Product> response = ApiResponse.error("មិនអាចបង្កើតផលិតផលបាន", e);
+//            logger.error("Error found", e);
+            ApiResponse<ProductDTO> response = ApiResponse.error("មិនអាចបង្កើតផលិតផលបាន", e);
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
         }
     }
