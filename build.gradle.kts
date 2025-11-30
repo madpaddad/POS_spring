@@ -20,6 +20,7 @@ repositories {
 }
 
 dependencies {
+    implementation("com.auth0:java-jwt:4.5.0")
 	implementation("org.springframework.boot:spring-boot-starter-web")
 	implementation("org.springframework.boot:spring-boot-starter-data-mongodb")
 	implementation(platform("io.mongock:mongock-bom:5.4.1"))
@@ -30,7 +31,8 @@ dependencies {
     annotationProcessor("org.mapstruct:mapstruct-processor:1.5.5.Final")
     implementation("org.springframework.security:spring-security-crypto")
     implementation("org.springframework.security:spring-security-config")
-//	implementation("org.springframework.boot:spring-boot-starter-data-redis")
+    implementation("org.springframework.security:spring-security-web")
+	implementation("org.springframework.boot:spring-boot-starter-data-redis")
     implementation("org.springframework.boot:spring-boot-starter-actuator")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
 	testRuntimeOnly("org.junit.platform:junit-platform-launcher")
