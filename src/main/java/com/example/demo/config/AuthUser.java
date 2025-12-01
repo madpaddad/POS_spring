@@ -1,24 +1,46 @@
 package com.example.demo.config;
 
+import com.example.demo.model.Role;
+
 import java.util.List;
 
 public class AuthUser {
-    private Long id;
-    private List<String> roles;
+    private String id;
+    private String name;
+    private Role role;
 //    private String passwordHash; // Optional, usually not needed
 
-    public AuthUser(Long id, List<String> roles, String passwordHash) {
+    public AuthUser(){
+
+    }
+    public AuthUser(String id, Role role) {
         this.id = id;
-        this.roles = roles;
+        this.role = role;
 //        this.passwordHash = passwordHash;
     }
 
-    public Long getId() {
-        return id;
+    public String getName(){
+        return this.name;
+    }
+       
+    public void setName(String name){
+        this.name = name;
+    }
+    
+    public void setId( String id){
+        this.id = id;
     }
 
-    public List<String> getRoles() {
-        return roles;
+    public String getId() {
+        return this.id;
+    }
+
+    public void setRole(Role role){
+        this.role = role;
+    }
+
+    public Role getRole() {
+        return this.role;
     }
 
 //    public String getPasswordHash() {

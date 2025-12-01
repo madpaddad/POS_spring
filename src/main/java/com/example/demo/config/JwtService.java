@@ -34,12 +34,12 @@ public class JwtService {
 
 
             String userId = decodedJWT.getSubject();
-            List<Role> roles = decodedJWT.getClaim(ROLES_CLAIM).asList(Role.class);
+            String roleString = decodedJWT.getClaim("role").asString();
 
-
-            return new AuthUser(userId, roles);
+            Role role = Role.valueOf(roleString);
+            return new AuthUser(userId, role);
         } catch (JWTVerificationException exception) {
-            throw new TokenAuthenticationException("JWT is not valid");
+            throw new JWTVerificationException("JWT is not valid");
         }
     }
 
@@ -50,12 +50,11 @@ public class JwtService {
         Date exp = new Date(expMillis);
 
 
-        List<String> roles = authUser.roles().stream().map(Role::name).toList();
-
+        String roleName = authUser.getRole().name();
 
         return JWT.create()
-                .withSubject(authUser.userId())
-                .withClaim(ROLES_CLAIM, roles)
+                .withSubject(authUser.getId())
+                .withClaim("role", roleName)
                 .withIssuedAt(now)
                 .withExpiresAt(exp)
                 .sign(signingAlgorithm);

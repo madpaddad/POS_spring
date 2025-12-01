@@ -62,7 +62,7 @@ public class User {
     // Seed users
     public static List<User> seedUser(PasswordEncoder passwordEncoder) {
         return Arrays.asList(
-                new User("1", "តារាផល", "087443344", "12345678", Role.Admin, passwordEncoder),
+                new User("1", "តារាផល", "087443349", "12345678", Role.Admin, passwordEncoder),
                 new User("2", "តារាផល", "087443344", "12345678", Role.Admin, passwordEncoder)
         );
     }

@@ -5,12 +5,11 @@ import java.util.List;
 import com.example.demo.model.*;
 import io.mongock.api.annotations.*;
 import io.mongock.api.annotations.ChangeUnit;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-@ChangeUnit(id="seed users", order = "002", author = "mongock")
+@ChangeUnit(id="user_reseed", order = "002", author = "mongock")
     public class DataBaseChangeLog {
 
     private final PasswordEncoder passwordEncoder;
@@ -57,6 +56,12 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
     @RollbackBeforeExecution
     public void rollbackBefore() {
+
+        mongoTemplate.remove(new Query(),User.class);
+        mongoTemplate.remove(new Query(),Product.class);
+        mongoTemplate.remove(new Query(),Category.class);
+        mongoTemplate.remove(new Query(),OrderItem.class);
+        mongoTemplate.remove(new Query(),Order.class);
 //        mongoTemplate.dropCollection("expense");
         tables.forEach(mongoTemplate::dropCollection);
         mongoTemplate.dropCollection(User.class);
@@ -68,11 +73,11 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
     @RollbackExecution
     public void rollback() {
-        mongoTemplate.remove(User.class);
-        mongoTemplate.remove(Product.class);
-        mongoTemplate.remove(Category.class);
-        mongoTemplate.remove(OrderItem.class);
-        mongoTemplate.remove(Order.class);
+        mongoTemplate.remove(new Query(),User.class);
+        mongoTemplate.remove(new Query(),Product.class);
+        mongoTemplate.remove(new Query(),Category.class);
+        mongoTemplate.remove(new Query(),OrderItem.class);
+        mongoTemplate.remove(new Query(),Order.class);
 //        tables.forEach(mongoTemplate::deleteMany);
     }
 
