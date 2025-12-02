@@ -62,7 +62,7 @@ public class AuthService implements UserDetailsService {
     }
 
 //    @PostMapping("/api/login")
-//    @ResponseBody
+    @ResponseBody
     public TokenDto login(LoginDto loginDto){
 
         User user = this.authRepository.findByPhoneNumber(loginDto.getPhoneNumber());

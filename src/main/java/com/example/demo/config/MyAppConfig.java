@@ -81,7 +81,7 @@ public class MyAppConfig {
         http.
                 authorizeHttpRequests((requests) -> requests
                         .dispatcherTypeMatchers(DispatcherType.FORWARD).permitAll()
-                        .requestMatchers("/api/login", "/error").permitAll()
+                        .requestMatchers("/error", "/login").permitAll()
                         .anyRequest().authenticated()
                 )
                 .authenticationProvider(authenticationProvider())

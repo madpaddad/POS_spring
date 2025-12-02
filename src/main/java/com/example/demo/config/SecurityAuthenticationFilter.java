@@ -32,43 +32,54 @@ public class SecurityAuthenticationFilter extends OncePerRequestFilter {
     protected boolean shouldNotFilter(HttpServletRequest request) {
         // Skip JWT check for login endpoint
         String path = request.getServletPath();
-        boolean skip = path.equals("/api/login"); // adjust if context path exists
+        boolean skip = path.equals("/login"); // adjust if context path exists
         if (skip) {
             log.info("Skipping JWT filter for {}", path);
         }
         return skip;
     }
 
+//    @Override
     @Override
     protected void doFilterInternal(
             HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
-//        logger.info("I am already finding it. ");
+
         String authenticationHeader = request.getHeader("Authorization");
         log.info("why am I here");
+        log.info("Inside Once Per Request Filter originated by request {}", request.getRequestURI());
         UsernamePasswordAuthenticationToken auth = null;
+
         if (authenticationHeader != null && authenticationHeader.startsWith("Bearer ")) {
             String token = authenticationHeader.substring(7);
             try {
                 AuthUser authuser = jwtService.resolveJwtToken(token);
-                String userId = authuser.getId();
+
                 if (SecurityContextHolder.getContext().getAuthentication() == null) {
-                    auth = new UsernamePasswordAuthenticationToken(authuser.getId(), null, List.of());
+                    auth = new UsernamePasswordAuthenticationToken(
+                            authuser.getId(),
+                            null,
+                            List.of()
+                    );
                 }
 
-
             } catch (JWTVerificationException e) {
-                // token invalid or expired
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                 return;
             }
         }
 
-        SecurityContext securityContext = SecurityContextHolder.createEmptyContext();
-        securityContext.setAuthentication(auth);
-        SecurityContextHolder.setContext(securityContext);
+        if (auth != null) {
+            SecurityContextHolder.getContext().setAuthentication(auth);
+        }
 
+        // **This must be called** to continue the request chain
         filterChain.doFilter(request, response);
+    }
+
+    @Override
+    protected boolean shouldNotFilterAsyncDispatch() {
+        return false;
     }
 
 
