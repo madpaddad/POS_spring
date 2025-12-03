@@ -2,14 +2,18 @@ package com.example.demo.config;
 
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.example.demo.auth.AuthController;
+import io.github.bucket4j.Bandwidth;
+import io.github.bucket4j.Bucket;
+import io.github.bucket4j.Refill;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.annotation.Bean;
-import org.springframework.http.MediaType;
+//import io.github.bucket4j.Bandwidth;
+//import io.github.bucket4j.Bucket;
+//import io.github.bucket4j.Refill;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -17,6 +21,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.time.Duration;
 import java.util.List;
 
 @Component
@@ -27,6 +32,11 @@ public class SecurityAuthenticationFilter extends OncePerRequestFilter {
 
     public SecurityAuthenticationFilter(JwtService jwtService) {
         this.jwtService = jwtService;
+    }
+
+    private Bucket createNewBucket(String clientIp) {
+        Bandwidth limit = Bandwidth.classic(10, Refill.greedy(10, Duration.ofMinutes(1))); // 10 requests per minute
+        return Bucket.builder().addLimit(limit).build();
     }
 
     @Override
@@ -42,6 +52,7 @@ public class SecurityAuthenticationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(
             HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
+
 
         String authenticationHeader = request.getHeader("Authorization");
         UsernamePasswordAuthenticationToken auth = null;
@@ -64,7 +75,7 @@ public class SecurityAuthenticationFilter extends OncePerRequestFilter {
             }
         }
         else {
-            sendUnauthorized(response, "Invalid or Expired Token");
+             sendUnauthorized(response, "Invalid or Expired Token");
             return;
         }
 

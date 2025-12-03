@@ -1,0 +1,13 @@
+spring:
+  cloud:
+    gateway:
+      routes:
+        - id: requestratelimiter_route
+          uri: https://example.org
+          filters:
+            - name: RequestRateLimiter
+              args:
+                bucket4j-rate-limiter.capacity: 20
+                bucket4j-rate-limiter.refillTokens: 10
+                bucket4j-rate-limiter.refillPeriod: 1s
+                bucket4j-rate-limiter.requestedTokens: 1

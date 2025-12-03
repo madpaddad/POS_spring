@@ -19,6 +19,11 @@ repositories {
 	mavenCentral()
 }
 
+dependencyManagement{
+    imports {
+        mavenBom("org.springframework.cloud:spring-cloud-dependencies:2024.0.0")
+    }
+}
 dependencies {
     implementation("com.auth0:java-jwt:4.5.0")
 	implementation("org.springframework.boot:spring-boot-starter-web")
@@ -28,6 +33,7 @@ dependencies {
     implementation("io.mongock:mongock-springboot-v3")
     implementation("io.mongock:mongodb-springdata-v4-driver")
     implementation("org.mapstruct:mapstruct:1.5.5.Final")
+    implementation("com.github.vladimir-bukhtoyarov:bucket4j-core:7.0.0")
     annotationProcessor("org.mapstruct:mapstruct-processor:1.5.5.Final")
     implementation("org.springframework.security:spring-security-crypto")
     implementation("org.springframework.security:spring-security-config")

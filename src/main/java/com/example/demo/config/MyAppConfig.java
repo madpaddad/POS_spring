@@ -39,11 +39,14 @@ public class MyAppConfig {
     private final AuthService authService;
     private final PasswordEncoder passwordEncoder;
     private final SecurityAuthenticationFilter securityAuthenticationFilter;
+    private final RateLimitFilter rateLimitFilter;
+
     private final JwtService jwtService;
-    public MyAppConfig(AuthService authService, PasswordEncoder passwordEncoder, SecurityAuthenticationFilter securityAuthenticationFilter, JwtService jwtService) {
+    public MyAppConfig(AuthService authService, PasswordEncoder passwordEncoder, SecurityAuthenticationFilter securityAuthenticationFilter, RateLimitFilter rateLimitFilter, JwtService jwtService) {
         this.authService = authService;
         this.passwordEncoder = passwordEncoder;
         this.securityAuthenticationFilter = securityAuthenticationFilter;
+        this.rateLimitFilter = rateLimitFilter;
         this.jwtService = jwtService;
     }
 
@@ -86,6 +89,7 @@ public class MyAppConfig {
                 )
                 .authenticationProvider(authenticationProvider())
                 .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
+                .addFilterAfter(rateLimitFilter, SecurityAuthenticationFilter.class)
                 .csrf(crsf -> crsf.disable())
 //                .formLogin(Customizer.withDefaults())
 //                .exceptionHandling(
@@ -98,4 +102,6 @@ public class MyAppConfig {
 
         return http.build();
     }
+
+
 }
