@@ -9,6 +9,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Bean;
+import org.springframework.http.MediaType;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -33,9 +34,6 @@ public class SecurityAuthenticationFilter extends OncePerRequestFilter {
         // Skip JWT check for login endpoint
         String path = request.getServletPath();
         boolean skip = path.equals("/login"); // adjust if context path exists
-        if (skip) {
-            log.info("Skipping JWT filter for {}", path);
-        }
         return skip;
     }
 
@@ -46,8 +44,6 @@ public class SecurityAuthenticationFilter extends OncePerRequestFilter {
             throws ServletException, IOException {
 
         String authenticationHeader = request.getHeader("Authorization");
-        log.info("why am I here");
-        log.info("Inside Once Per Request Filter originated by request {}", request.getRequestURI());
         UsernamePasswordAuthenticationToken auth = null;
 
         if (authenticationHeader != null && authenticationHeader.startsWith("Bearer ")) {
@@ -64,9 +60,12 @@ public class SecurityAuthenticationFilter extends OncePerRequestFilter {
                 }
 
             } catch (JWTVerificationException e) {
-                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                return;
+                return ;
             }
+        }
+        else {
+            sendUnauthorized(response, "Invalid or Expired Token");
+            return;
         }
 
         if (auth != null) {
@@ -82,6 +81,15 @@ public class SecurityAuthenticationFilter extends OncePerRequestFilter {
         return false;
     }
 
+
+    private void sendUnauthorized(HttpServletResponse response, String message) throws IOException {
+        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+
+        String json = "{ \"error\": \"" + message + "\" }";
+        response.getWriter().write(json);
+    }
 
 
 }
