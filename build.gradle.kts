@@ -31,6 +31,8 @@ dependencies {
 	implementation(platform("io.mongock:mongock-bom:5.4.1"))
 	implementation("io.mongock:mongock-springboot-v3:5.4.1")
     implementation("io.mongock:mongock-springboot-v3")
+    implementation("org.springframework.boot:spring-boot-starter-webflux")
+//    implementation("org.springframework.cloud:spring-cloud-starter-config")
     implementation("io.mongock:mongodb-springdata-v4-driver")
     implementation("org.mapstruct:mapstruct:1.5.5.Final")
     implementation("com.github.vladimir-bukhtoyarov:bucket4j-core:7.0.0")

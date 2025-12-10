@@ -45,6 +45,7 @@ public class SecurityAuthenticationFilter extends OncePerRequestFilter {
         String path = request.getServletPath();
         boolean skip = path.equals("/login"); // adjust if context path exists
         return skip;
+//            return false;
     }
 
 //    @Override

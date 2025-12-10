@@ -28,6 +28,9 @@ public class Product {
     private boolean has_subproduct;
 
     @Field
+    private String path;
+
+    @Field
     private Map<String, Integer> sub_product = new HashMap<>(); 
 
 
