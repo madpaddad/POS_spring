@@ -9,6 +9,7 @@ import org.springframework.boot.autoconfigure.graphql.GraphQlProperties;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.client.MultipartBodyBuilder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -40,19 +41,22 @@ public class FileService {
 
     public String callHi(FileCreateDto data, MultipartFile file) {
 //        try{
+            MultipartBodyBuilder builder = new MultipartBodyBuilder();
+//
+            builder.part("file", file.getResource())
+                            .filename(file.getOriginalFilename())
+                                    .contentType(MediaType.parseMediaType(file.getContentType()));
 
-            MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
-
-            body.add("file", file);
-            body.add("name", data.getName());
-            body.add("category", data.getCategory());
+            builder.part("data", data)
+                    .contentType(MediaType.APPLICATION_JSON);
 
 
+            log.info("Sending body{}", builder);
             Mono<ResponseEntity<String>> response = webclient.
                     post().
                     uri("/api/fileService/save")
                     .contentType(MediaType.MULTIPART_FORM_DATA)
-                    .bodyValue(body)
+                    .bodyValue(builder.build())
                     .retrieve()
                     .toEntity(String.class)
                     .doOnSubscribe(sub -> log.info("Subscribe to the list"))
