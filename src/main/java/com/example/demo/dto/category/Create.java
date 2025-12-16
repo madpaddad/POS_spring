@@ -2,6 +2,7 @@ package com.example.demo.dto.category;
 
 public class Create {
 
+    public Create(){}
     private String name;
 
     public String getName() {

@@ -17,6 +17,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.slf4j.Logger;
+import reactor.core.publisher.Mono;
+
 import java.util.List;
 import java.util.Optional;;
 
@@ -65,10 +67,11 @@ public class ProductService {
         try {
 
             // Check if a category name exist before insert
-            if(!categoryRepository.existsByName(product.getCategory())){
-//                logger.info(product.getCategory());
+            Boolean exists = categoryRepository.existsByName(product.getCategory()).block();
+            if (exists == null || !exists) {
                 throw new IllegalArgumentException("មិនមានប្រភេទទិន្នន័យ");
             }
+
 
             if (product.ishas_subproducts()) {
                 if (product.getSub_products() == null){

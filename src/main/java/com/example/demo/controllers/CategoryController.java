@@ -7,11 +7,14 @@ import com.example.demo.services.CategoryService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Mono;
 
 import java.util.List;
 
-@Controller
-@RequestMapping("/api/WASSUP")
+import static org.reflections.Reflections.log;
+
+@RestController
+@RequestMapping("/api/category")
 public class CategoryController {
 
     private final CategoryService categoryService;
@@ -25,14 +28,19 @@ public class CategoryController {
      ***********************************************************************/
     @GetMapping()
     @ResponseBody
-    public ResponseEntity<List<Category>> get(){
+    public Mono<ResponseEntity<List<Category>>> get(){
         return this.categoryService.get();
     }
 
     @PostMapping()
     @ResponseBody
-    public ResponseEntity<ApiResponse<Create>> create(@RequestBody(required=true) Create create) {
+    public Mono<ResponseEntity<ApiResponse>> create(@RequestBody(required=true) Create create) {
+//        log.info("Controller buycket hit");
         return this.categoryService.create(create);
+
+//        return Mono.just(
+//                ResponseEntity.ok("Hello")
+//        );
     }
 
 //    @PutMapping()

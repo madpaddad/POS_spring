@@ -1,8 +1,6 @@
 package com.example.demo.dto.file;
 
-import java.io.File;
-
-public class FileCreateDto {
+public class Create {
 
     private String category;
     private String name;
@@ -15,9 +13,5 @@ public class FileCreateDto {
     public String getName(){
         return name;
     }
-
-//    public File getFile(){
-//        return file;
-//    }
 
 }

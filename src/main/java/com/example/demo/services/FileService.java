@@ -1,27 +1,18 @@
 package com.example.demo.services;
 
-import com.example.demo.dto.file.FileCreateDto;
-import jakarta.annotation.Resource;
+import com.example.demo.dto.file.Create;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.graphql.GraphQlProperties;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.MultipartBodyBuilder;
 import org.springframework.stereotype.Service;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
-import org.springframework.web.ErrorResponseException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
-
-import java.io.File;
-import java.util.Collections;
-import java.util.List;
 
 @Service
 public class FileService {
@@ -39,7 +30,7 @@ public class FileService {
         this.restTemplate = restTemplate;
     }
 
-    public String callHi(FileCreateDto data, MultipartFile file) {
+    public String callHi(Create data, MultipartFile file) {
 //        try{
             MultipartBodyBuilder builder = new MultipartBodyBuilder();
 //

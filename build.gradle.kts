@@ -29,6 +29,7 @@ dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-web")
 	implementation("org.springframework.boot:spring-boot-starter-data-mongodb")
 	implementation(platform("io.mongock:mongock-bom:5.4.1"))
+    implementation("org.springframework.boot:spring-boot-starter-data-mongodb-reactive")
 	implementation("io.mongock:mongock-springboot-v3:5.4.1")
     implementation("io.mongock:mongock-springboot-v3")
     implementation("org.springframework.boot:spring-boot-starter-webflux")
