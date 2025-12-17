@@ -1,7 +1,7 @@
 package com.example.demo.config;
 
 import com.auth0.jwt.exceptions.JWTVerificationException;
-import com.example.demo.auth.AuthController;
+import com.auth0.jwt.exceptions.TokenExpiredException;
 import io.github.bucket4j.Bandwidth;
 import io.github.bucket4j.Bucket;
 import io.github.bucket4j.Refill;
@@ -14,23 +14,25 @@ import org.slf4j.LoggerFactory;
 //import io.github.bucket4j.Bandwidth;
 //import io.github.bucket4j.Bucket;
 //import io.github.bucket4j.Refill;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 import java.time.Duration;
+import java.util.Date;
 import java.util.List;
 
-@Component
-public class SecurityAuthenticationFilter extends OncePerRequestFilter {
-    private static final Logger log = LoggerFactory.getLogger(SecurityAuthenticationFilter.class);
+
+//@Order(Ordered.HIGHEST_PRECEDENCE)
+@Configuration
+public class AuthenticationFilter extends OncePerRequestFilter {
+    private static final Logger log = LoggerFactory.getLogger(AuthenticationFilter.class);
 
     private final JwtService jwtService;
 
-    public SecurityAuthenticationFilter(JwtService jwtService) {
+    public AuthenticationFilter(JwtService jwtService) {
         this.jwtService = jwtService;
     }
 
@@ -54,15 +56,20 @@ public class SecurityAuthenticationFilter extends OncePerRequestFilter {
             HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
 
+        log.info("DoFilterInternal hit");
 
         String authenticationHeader = request.getHeader("Authorization");
         UsernamePasswordAuthenticationToken auth = null;
 
+        log.info("authentication header{}", authenticationHeader);
         if (authenticationHeader != null && authenticationHeader.startsWith("Bearer ")) {
             String token = authenticationHeader.substring(7);
-            try {
+
+            try{
+                log.info("token {}", token);
                 AuthUser authuser = jwtService.resolveJwtToken(token);
 
+                log.info("Authuser {}", authuser);
                 if (SecurityContextHolder.getContext().getAuthentication() == null) {
                     auth = new UsernamePasswordAuthenticationToken(
                             authuser.getId(),
@@ -70,10 +77,20 @@ public class SecurityAuthenticationFilter extends OncePerRequestFilter {
                             List.of()
                     );
                 }
-
-            } catch (JWTVerificationException e) {
-                return ;
+            } catch (TokenExpiredException ex) {
+                log.warn("JWT token expired: {}", ex.getMessage());
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED); // 401
+                response.setContentType("application/json");
+                response.getWriter().write("{\"error\": \"JWT token has expired\"}");
+                return; // stop further filters
+            } catch (JWTVerificationException ex) {
+                log.warn("JWT token invalid: {}", ex.getMessage());
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED); // 401
+                response.setContentType("application/json");
+                response.getWriter().write("{\"error\": \"JWT token is invalid\"}");
+                return;
             }
+
         }
         else {
              sendUnauthorized(response, "Invalid or Expired Token");
