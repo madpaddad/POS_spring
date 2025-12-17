@@ -45,18 +45,6 @@ public class CategoryService {
      Get Category
      ***********************************************************************/
 
-//    public ResponseEntity<List<Category>> get() {
-//
-//        List<Category> list;
-//
-//        Flux<Category> list = categoryRepository.findAll();
-//        list.
-//        if (list.bl) {
-//            return ResponseEntity.notFound().build();
-//        }
-//
-//        return ResponseEntity.ok(list);
-//    }
     public Mono<ResponseEntity<List<Category>>> get() {
 
         // Call the service method, which returns Flux<Category>
@@ -95,7 +83,7 @@ public class CategoryService {
         // 1. Check if category exists (Mono<Boolean>)
         Mono<Boolean> existsMono = categoryRepository.existsByName(create.getName());
 
-        return existsMono
+        return categoryRepository.save(mapper.toEntity(create))
                 // 2. Decide what to do based on the existence check
                 .flatMap(exists -> {
                     if (Boolean.TRUE.equals(exists)) {
@@ -106,10 +94,11 @@ public class CategoryService {
 
                     // Category does not exist: Proceed with the WebClient call
                     log.info("Attempting to create a new bucket and category.");
-
+                    log.info("Creating a category call{}", create);
                     // 3. Call the external service (Mono<ResponseEntity<Object>>)
                     // We use .flatMap() to wait for the web service call to complete
                     log.info("jam mer vea return ey {}", postToBucketService(create));
+
                     return postToBucketService(create);
                 });
     }

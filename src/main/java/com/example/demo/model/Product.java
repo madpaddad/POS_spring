@@ -89,6 +89,14 @@ public class Product {
         this.has_subproduct = has_subproduct;
     }
 
+    public String getPath() {
+        return path;
+    }
+
+    public void setPath(String path) {
+        this.path = path;
+    }
+
     public Product(String id, String name, String category, double price) {
         this.id = id;
         this.name = name;
@@ -96,7 +104,6 @@ public class Product {
         this.price = price;
         this.has_subproduct = false;
     }
-
 
     public Product(String name, String category, Map<String, Integer> sub_product){
         this.name = name;

@@ -1,6 +1,8 @@
 package com.example.demo.services;
 
+import com.example.demo.dto.file.Create;
 import com.example.demo.dto.order.ProductDTO;
+import com.example.demo.dto.product.ProductFile;
 import com.example.demo.helper.ApiResponse;
 import com.example.demo.helper.CustomerMapper;
 import com.example.demo.helper.ProductMapper;
@@ -9,18 +11,25 @@ import com.example.demo.repository.CategoryRepository;
 import com.example.demo.repository.ProductRepository;
 
 import com.example.demo.share.MongoQuery;
+import org.apache.coyote.Response;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.client.MultipartBodyBuilder;
 import org.springframework.stereotype.Service;
 import org.slf4j.Logger;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
-import java.util.Optional;;
+import java.util.Optional;
+import static org.reflections.Reflections.log;
 
 @Service
 public class ProductService {
@@ -28,12 +37,17 @@ public class ProductService {
     public Logger logger;
     private final ProductRepository productRepository;
     private final CategoryRepository categoryRepository;
-//    private final MongoQuery mongoQuery;
+    private final FileService fileService;
+    @Autowired
+    private final WebClient webclient;
     private final ProductMapper mapper;
-    public ProductService(ProductRepository productRepository, CategoryRepository categoryRepository, ProductMapper mapper) {
+
+
+    public ProductService(ProductRepository productRepository, CategoryRepository categoryRepository, FileService fileService, WebClient webclient, ProductMapper mapper) {
         this.productRepository = productRepository;
         this.categoryRepository = categoryRepository;
-//        this.mongoQuery = mongoQuery;
+        this.fileService = fileService;
+        this.webclient = webclient;
         this.mapper = mapper;
     }
 
@@ -62,7 +76,7 @@ public class ProductService {
      Create Product
      ***********************************************************************/
 
-    public ResponseEntity<ApiResponse<ProductDTO>> create(ProductDTO product) {
+    public ResponseEntity<ApiResponse<ProductDTO>> create(ProductDTO product, MultipartFile file) {
 
         try {
 
@@ -78,6 +92,47 @@ public class ProductService {
                     throw new IllegalArgumentException("មិនមានទិន្នន័យគ្រប់គ្រាន់ដើម្បីបញ្ចូល");
                 }
             }
+
+
+            log.info("file: {}", file);
+            if (file != null && !file.isEmpty()) {
+
+                MultipartBodyBuilder builder = new MultipartBodyBuilder();
+                Create prod = new Create(product.getCategory(), product.getName());
+                String path = fileService.callHi(prod, file);
+
+                log.info("path{}", path);
+//                builder.part("file", file.getResource())
+//                        .filename(file.getOriginalFilename())
+//                        .contentType(MediaType.parseMediaType(file.getContentType()));
+//
+//                builder.part("data", prod)
+//                        .contentType(MediaType.APPLICATION_JSON);
+//
+//                log.info("Body data{}", prod);
+//                log.info("Attemppting to sending the image to");
+//                Mono<ResponseEntity<String>> path = webclient.
+//                        post().
+//                        uri("/api/fileService/save")
+//                        .contentType(MediaType.MULTIPART_FORM_DATA)
+//                        .bodyValue(builder.build())
+//                        .retrieve()
+//                        .toEntity(String.class)
+//                        .onErrorResume(error -> {
+//                            System.err.println("Error occurred: " + error.getMessage());
+//                            return Mono.just(ResponseEntity
+//                                    .status(HttpStatus.BAD_REQUEST)
+//                                    .body("Error: " + error.getMessage()));
+//                        })
+//                        .onErrorReturn(
+//                                ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error Occured")
+//                        );
+//
+//                log.info("Path sending {}", path);
+            }
+
+
+
             // Check for sub product and boolean
 
             Product savedproduct = productRepository.save(mapper.toEntity(product));

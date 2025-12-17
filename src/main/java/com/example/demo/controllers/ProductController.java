@@ -3,12 +3,14 @@ package com.example.demo.controllers;
 
 import com.example.demo.dto.order.ProductDTO;
 import com.example.demo.helper.ApiResponse;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.http.ResponseEntity;
 import com.example.demo.services.ProductService;
 // model
 import com.example.demo.model.Product;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -29,10 +31,12 @@ public class ProductController {
         return this.productService.get(category_id);
     }
 
-    @PostMapping("/create")
+    @PostMapping(value = "/create", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @ResponseBody
-    public ResponseEntity<ApiResponse<ProductDTO>> create(@RequestBody ProductDTO product) {
-        return this.productService.create(product);
+    public ResponseEntity<ApiResponse<ProductDTO>> create(
+            @RequestPart ProductDTO product,
+            @RequestPart("file") MultipartFile file) {
+        return this.productService.create(product, file);
     }
 
     @PutMapping()

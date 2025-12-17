@@ -14,4 +14,8 @@ public class Create {
         return name;
     }
 
+    public Create(String category, String name) {
+        this.category = category;
+        this.name = name;
+    }
 }
