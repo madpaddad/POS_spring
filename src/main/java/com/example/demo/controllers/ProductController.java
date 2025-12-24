@@ -31,7 +31,7 @@ public class ProductController {
         return this.productService.get(category_id);
     }
 
-    @PostMapping(value = "/create", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(value = "", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @ResponseBody
     public ResponseEntity<ApiResponse<ProductDTO>> create(
             @RequestPart ProductDTO product,
