@@ -1,6 +1,7 @@
 package com.example.demo.controllers;
 
 import com.example.demo.dto.category.Create;
+import com.example.demo.dto.category.DeleteCategoryDTO;
 import com.example.demo.dto.category.UpdateCategoryDTO;
 import com.example.demo.helper.ApiResponse;
 import com.example.demo.model.Category;
@@ -46,13 +47,13 @@ public class CategoryController {
 
     @PutMapping()
     @ResponseBody
-    public ResponseEntity<ApiResponse<UpdateCategoryDTO>> update(@RequestParam(required = false) String id, @RequestBody UpdateCategoryDTO updateCategoryDTO){
+    public Mono<ResponseEntity<ApiResponse<UpdateCategoryDTO>>> update(@RequestParam(required = false) String id, @RequestBody UpdateCategoryDTO updateCategoryDTO){
         return this.categoryService.update(id, updateCategoryDTO);
     }
-//
-//    @DeleteMapping()
-//    @ResponseBody
-//    public ResponseEntity<ApiResponse<String>> delete(@RequestParam(required = true) String id){
-//        return this.categoryService.delete(id);
-//    }
+
+    @DeleteMapping()
+    @ResponseBody
+    public ResponseEntity<ApiResponse<String>> delete(@RequestBody DeleteCategoryDTO deleteCategoryDTO){
+        return this.categoryService.delete(deleteCategoryDTO);
+    }
 }

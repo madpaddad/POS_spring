@@ -144,7 +144,7 @@ public class ProductService {
 //            logger.error(e);
             e.printStackTrace();
 //            logger.error("Error found", e);
-            ApiResponse<ProductDTO> response = ApiResponse.error("មិនអាចបង្កើតផលិតផលបាន", e);
+            ApiResponse<ProductDTO> response = ApiResponse.error("មិនអាចបង្កើតផលិតផលបាន");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
         }
     }
@@ -173,7 +173,7 @@ public class ProductService {
             return ResponseEntity.ok(response);
         } catch (Exception e){
 
-            ApiResponse<ProductDTO> response = ApiResponse.error("គ្មានផលិតផលក្នុងស្តុក", e);
+            ApiResponse<ProductDTO> response = ApiResponse.error("គ្មានផលិតផលក្នុងស្តុក");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
 
         }
@@ -199,7 +199,7 @@ public class ProductService {
             return ResponseEntity.ok(response);
         } catch (Exception e) {
 
-            ApiResponse<String> response = ApiResponse.error("error", e);
+            ApiResponse<String> response = ApiResponse.error("error");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
         }
     }
