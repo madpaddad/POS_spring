@@ -102,33 +102,6 @@ public class ProductService {
                 String path = fileService.callHi(prod, file);
 
                 log.info("path{}", path);
-//                builder.part("file", file.getResource())
-//                        .filename(file.getOriginalFilename())
-//                        .contentType(MediaType.parseMediaType(file.getContentType()));
-//
-//                builder.part("data", prod)
-//                        .contentType(MediaType.APPLICATION_JSON);
-//
-//                log.info("Body data{}", prod);
-//                log.info("Attemppting to sending the image to");
-//                Mono<ResponseEntity<String>> path = webclient.
-//                        post().
-//                        uri("/api/fileService/save")
-//                        .contentType(MediaType.MULTIPART_FORM_DATA)
-//                        .bodyValue(builder.build())
-//                        .retrieve()
-//                        .toEntity(String.class)
-//                        .onErrorResume(error -> {
-//                            System.err.println("Error occurred: " + error.getMessage());
-//                            return Mono.just(ResponseEntity
-//                                    .status(HttpStatus.BAD_REQUEST)
-//                                    .body("Error: " + error.getMessage()));
-//                        })
-//                        .onErrorReturn(
-//                                ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error Occured")
-//                        );
-//
-//                log.info("Path sending {}", path);
             }
 
 

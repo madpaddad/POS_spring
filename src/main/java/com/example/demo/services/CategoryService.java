@@ -28,11 +28,13 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 import com.mongodb.client.result.UpdateResult;
 
+import java.util.IllegalFormatCodePointException;
 import java.util.List;
 
 
@@ -97,44 +99,54 @@ public class CategoryService {
      ***********************************************************************/
 
     // Method signature MUST change to return a Mono
-    public Mono<ResponseEntity<ApiResponse>> create(Create create) {
+    public Mono<ApiResponse<Create>> create(Create create) {
         log.info("We are going into the servicee");
-        // 1. Check if category exists (Mono<Boolean>)
-        Mono<Boolean> existsMono = categoryRepository.existsByName(create.getName());
 
-        return categoryRepository.save(mapper.toEntity(create))
+        return categoryRepository.existsByName(create.getName())
                 // 2. Decide what to do based on the existence check
-                .flatMap(exists -> {
-                    if (Boolean.TRUE.equals(exists)) {
-                        // Category exists: Terminate the chain by throwing an error
-                        // (or returning a Mono.error)
-                        return Mono.error(new IllegalArgumentException("ប្រភេទទិន្នន័យមាន"));
+                .flatMap(exist -> {
+                    if (exist) {
+                        return Mono.just(ApiResponse.error("ប្រភេទទិន្នន៏យមាន"));
                     }
-
-                    // Category does not exist: Proceed with the WebClient call
-                    log.info("Attempting to create a new bucket and category.");
-                    log.info("Creating a category call{}", create);
-                    // 3. Call the external service (Mono<ResponseEntity<Object>>)
-                    // We use .flatMap() to wait for the web service call to complete
-                    log.info("jam mer vea return ey {}", postToBucketService(create));
-
-                    return postToBucketService(create);
+                    // Directly call the method; no need for Mono.just(create)
+                    return categoryRepository.save(mapper.toEntity(create))
+                            .flatMap(savedEntity -> postToBucketService(create))
+                            .map(fileRes -> ApiResponse.success(create, "បង្កើតបានជោគជ័យ"));
                 });
+
+
     }
 
 
     // Method signature change: Mono<ResponseEntity<Object>>
-    public Mono<ResponseEntity<ApiResponse>> postToBucketService(Create create) {
+    public Mono<Void> postToBucketService(Create create) {
         return webClient.post()
                 .uri("/api/fileService/bucket")
                 .bodyValue(create)
                 .retrieve()
                 // Successful path returns Mono<ResponseEntity<Void>>
+                .onStatus(
+                        httpStatusCode -> httpStatusCode == HttpStatus.BAD_REQUEST,
+                        response -> Mono.error(
+                                new IllegalArgumentException("មិនអាចដាក់ឈ្មោះបានឡើយ")
+                        )
+                )
+                .onStatus(
+                        httpStatusCode -> httpStatusCode == HttpStatus.INTERNAL_SERVER_ERROR, // matches any 5xx status
+                        response -> Mono.error(
+                                new IllegalArgumentException("យើសអាក្ដ")
+                        )
+                )
                 .toBodilessEntity()
+                .then();
                 // Map successful status to ResponseEntity<HttpStatus> (which is a form of Object)
-                .map(response -> ResponseEntity.<Object>status(response.getStatusCode()).build());
+//                .map(response -> ApiResponse.success(null, "បង្កើតជោគជ័យ"))
+//                .onErrorResume(throwable -> {
+//                    return ApiResponse.error(throwable.getMessage());
+//                });
+//                .thenReturn(create)
+//                .onErrorMap(throwable -> new Throwable()).thenReturn(throwable);
     }
-
 
 
 
@@ -142,54 +154,8 @@ public class CategoryService {
      Update
      ***********************************************************************/
 
-//    public Mono<ResponseEntity<ApiResponse<UpdateCategoryDTO>>> update(String id, UpdateCategoryDTO updateCategoryDTO) {
-//
-//        try {
-//
-//            Category category = mongoTemplate.findOne(Query.query(Criteria.where("name").is(updateCategoryDTO.getName())), Category.class);
-//
-//            if(updateCategoryDTO.getName().isEmpty()){
-//                throw new IllegalArgumentException("No Category Provided");
-//            }
-//
-//            Boolean exists = categoryRepository.existsByName(updateCategoryDTO.getName()).blockOptional().orElseThrow(() ->
-//                    new ResourceNotFound("Category Not found in data"));
-//
-//            // Update the bucket name:
-//            Mono<UpdateCategoryDTO> bucket_update = updateToBucketService(updateCategoryDTO);
-//
-//
-//            log.info("Status of updating youyr minio: {}", status);
-//            // Query key category with name
-//            Query query = new Query(Criteria.where("category").is(updateCategoryDTO.getName()));
-//            // Set with new value
-//            Update update = new Update().set("category", updateCategoryDTO.getNew_name());
-//            // Update value in product class
-//            mongoTemplate.updateMulti(query, update, Product.class);
-//
-//
-//            // Update value in Category class
-//            Category updatedCategory  = mongoTemplate.update(Category.class)
-//                    .matching(Query.query(Criteria.where("name").is(category.getName())))
-//                    .apply(new Update().set("name", updateCategoryDTO.getNew_name()))
-//                    .withOptions(FindAndModifyOptions.options().returnNew(true))
-//                    .findAndModifyValue();
-//
-//            log.info("Your category is updated: {}", updatedCategory.getName());
-//
-//            ApiResponse<UpdateCategoryDTO> response = ApiResponse.success(updateCategoryDTO, "ព័ត៌មានកែប្រែដោយជោគជ័យ");
-//
-//            return ResponseEntity.ok(status);
-//        } catch (Exception e){
-////
-//            ApiResponse<UpdateCategoryDTO> response = ApiResponse.error("គ្មានផលិតផលក្នុងប្រភេទ");
-//            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
-////
-//        }
-//    }
 
-
-    public Mono<UpdateCategoryDTO> update(String id, UpdateCategoryDTO dto) {
+    public Mono<ApiResponse<UpdateCategoryDTO>> update(String id, UpdateCategoryDTO dto) {
 
         if (dto.getName() == null || dto.getName().isEmpty()) {
             return Mono.error(new IllegalArgumentException("No Category Provided"));
@@ -209,7 +175,7 @@ public class CategoryService {
                 .thenReturn(updateCategoryDTO);
     }
 
-    public Mono<UpdateCategoryDTO> update_category(UpdateCategoryDTO updateCategoryDTO){
+    public Mono<ApiResponse<UpdateCategoryDTO>> update_category(UpdateCategoryDTO updateCategoryDTO){
         return reactiveMongoTemplate.findAndModify(
                 Query.query(Criteria.where("name").is(updateCategoryDTO.getName())),
                 new Update().set("name", updateCategoryDTO.getNew_name()),
@@ -217,9 +183,8 @@ public class CategoryService {
                 Category.class
         )
                 .switchIfEmpty(Mono.error(new RuntimeException("Category not found")))
-                .thenReturn(updateCategoryDTO);
+                .thenReturn(ApiResponse.success(updateCategoryDTO, "កែប្រែាំព័ត៌មានជោគជ័យ"));
     }
-
 
     public Mono<UpdateCategoryDTO> updateToBucketService(UpdateCategoryDTO updateCategoryDTO) {
         return webClient.put()

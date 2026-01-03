@@ -36,7 +36,7 @@ public class CategoryController {
 
     @PostMapping()
     @ResponseBody
-    public Mono<ResponseEntity<ApiResponse>> create(@RequestBody(required=true) Create create) {
+    public Mono<ApiResponse<Create>> create(@RequestBody(required=true) Create create) {
 //        log.info("Controller buycket hit");
         return this.categoryService.create(create);
 
@@ -47,7 +47,7 @@ public class CategoryController {
 
     @PutMapping()
     @ResponseBody
-    public Mono<ResponseEntity<ApiResponse<UpdateCategoryDTO>>> update(@RequestParam(required = false) String id, @RequestBody UpdateCategoryDTO updateCategoryDTO){
+    public Mono<ApiResponse<UpdateCategoryDTO>> update(@RequestParam(required = false) String id, @RequestBody UpdateCategoryDTO updateCategoryDTO){
         return this.categoryService.update(id, updateCategoryDTO);
     }
 
