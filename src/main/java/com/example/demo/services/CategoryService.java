@@ -134,7 +134,7 @@ public class CategoryService {
                 .onStatus(
                         httpStatusCode -> httpStatusCode == HttpStatus.INTERNAL_SERVER_ERROR, // matches any 5xx status
                         response -> Mono.error(
-                                new IllegalArgumentException("យើសអាក្ដ")
+                                new IllegalArgumentException("មានបញ្ហា")
                         )
                 )
                 .toBodilessEntity()
