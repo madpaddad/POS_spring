@@ -1,5 +1,7 @@
 package com.example.demo.helper;
 
+import reactor.core.publisher.Mono;
+
 public class ApiResponse<T> {
     private boolean success;
     private String message;
@@ -14,13 +16,13 @@ public class ApiResponse<T> {
         return res;
     }
 
-    public static <T> ApiResponse<T> error(String message, Exception e) {
+    public static <T> ApiResponse <T> error(String message) {
         ApiResponse<T> res = new ApiResponse<>();
         res.success = false;
         res.message = message;
-        res.e_message = e.getMessage();
         return res;
     }
+
 
     public boolean isSuccess() {
         return success;

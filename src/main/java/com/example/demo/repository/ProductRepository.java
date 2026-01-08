@@ -28,4 +28,6 @@ public interface ProductRepository extends MongoRepository<Product, String>{
 //            "{ $group: { _id: '$_id', tableNo: { $first: '$tableNo' }, orderStatus: { $first: '$orderStatus' }, orderItems: { $push: '$orderItems' } } }"
 //    })
 //    orderDTO findOrderById(String id);
+
+    List<Product> findAllByCategory(String category);
 }

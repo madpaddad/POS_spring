@@ -1,6 +1,8 @@
 package com.example.demo.controllers;
 
 import com.example.demo.dto.category.Create;
+import com.example.demo.dto.category.DeleteCategoryDTO;
+import com.example.demo.dto.category.UpdateCategoryDTO;
 import com.example.demo.helper.ApiResponse;
 import com.example.demo.model.Category;
 import com.example.demo.services.CategoryService;
@@ -34,7 +36,7 @@ public class CategoryController {
 
     @PostMapping()
     @ResponseBody
-    public Mono<ResponseEntity<ApiResponse>> create(@RequestBody(required=true) Create create) {
+    public Mono<ApiResponse<Create>> create(@RequestBody(required=true) Create create) {
 //        log.info("Controller buycket hit");
         return this.categoryService.create(create);
 
@@ -43,15 +45,15 @@ public class CategoryController {
 //        );
     }
 
-//    @PutMapping()
-//    @ResponseBody
-//    public ResponseEntity<ApiResponse<ProductDTO>> update(@RequestParam(required = true) String id,@RequestBody ProductDTO product){
-//        return this.categoryService.update(id, product);
-//    }
-//
-//    @DeleteMapping()
-//    @ResponseBody
-//    public ResponseEntity<ApiResponse<String>> delete(@RequestParam(required = true) String id){
-//        return this.categoryService.delete(id);
-//    }
+    @PutMapping()
+    @ResponseBody
+    public Mono<ApiResponse<UpdateCategoryDTO>> update(@RequestParam(required = false) String id, @RequestBody UpdateCategoryDTO updateCategoryDTO){
+        return this.categoryService.update(id, updateCategoryDTO);
+    }
+
+    @DeleteMapping()
+    @ResponseBody
+    public ResponseEntity<ApiResponse<String>> delete(@RequestBody DeleteCategoryDTO deleteCategoryDTO){
+        return this.categoryService.delete(deleteCategoryDTO);
+    }
 }

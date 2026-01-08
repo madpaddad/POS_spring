@@ -1,12 +1,12 @@
 package com.example.demo.services;
 
 import com.example.demo.dto.file.Create;
+import com.example.demo.dto.file.CreateResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.MultipartBodyBuilder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -30,10 +30,15 @@ public class FileService {
         this.restTemplate = restTemplate;
     }
 
-    public String callHi(Create data, MultipartFile file) {
-//        try{
+    /**********************************************************************
+     Create Product File:
+     - it should return back a path to save on model attributes
+     ***********************************************************************/
+
+
+    public Mono<String> create(Create data, MultipartFile file) {
+
             MultipartBodyBuilder builder = new MultipartBodyBuilder();
-//
             builder.part("file", file.getResource())
                             .filename(file.getOriginalFilename())
                                     .contentType(MediaType.parseMediaType(file.getContentType()));
@@ -43,41 +48,20 @@ public class FileService {
 
 
             log.info("Sending body{}", builder);
-            Mono<ResponseEntity<String>> response = webclient.
+            Mono<String> response = webclient.
                     post().
-                    uri("/api/fileService/save")
+                    uri("/api/fileService/product")
                     .contentType(MediaType.MULTIPART_FORM_DATA)
                     .bodyValue(builder.build())
                     .retrieve()
-                    .toEntity(String.class)
-                    .doOnSubscribe(sub -> log.info("Subscribe to the list"))
-                    .onErrorReturn(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error Occured"));
+                    .bodyToMono(CreateResponse.class) // define the Response DTO that it returns for type safe
+                    .map(CreateResponse::getPath); // map the value and return back to the method
 
-            log.info("Response{}",response);
 
-            ResponseEntity<String> responseEntity = response.block(); // block() waits for the response
-            return responseEntity != null ? responseEntity.getBody() : "Error occurred";
-//            String url = "http://localhost:8088/file-service/hi";
-//            log.info("url is {}", url);
 
-            // Use getForEntity to capture the response status
-//            ResponseEntity<String> response = restTemplate.getForEntity(url, String.class);
 
-            // Log the status code!
-//            log.info("Status Code from 8088: {}", response.getHeaders());
+            return response;
 
-//            // If you see 401/403, that's your problem.
-//            if (response.getStatusCode().is2xxSuccessful()) {
-//                return response.getBody();
-//            } else {
-//
-//                // Handle the error (e.g., return a default or rethrow a custom exception)
-//                throw new RuntimeException("Call to 8088 failed with status: " + response.getStatusCode());
-//            }
-//        } catch (Exception e){
-//            log.error(e.getMessage());
-//            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("error request");
-//        }
 
     }
 }

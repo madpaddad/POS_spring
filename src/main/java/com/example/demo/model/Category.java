@@ -17,6 +17,9 @@ public class Category {
     @Field
     private String name;
 
+    @Field
+    private String name_en;
+
     public String getId() {
         return id;
     }

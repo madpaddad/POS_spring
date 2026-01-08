@@ -31,6 +31,9 @@ public class Product {
     private String path;
 
     @Field
+    private Boolean is_available;
+
+    @Field
     private Map<String, Integer> sub_product = new HashMap<>(); 
 
 
@@ -70,6 +73,13 @@ public class Product {
         this.category = category;
     }
 
+    public Boolean getIs_available() {
+        return is_available;
+    }
+
+    public void setIs_available(Boolean is_available) {
+        this.is_available = is_available;
+    }
 
     public Map<String, Integer> getsub_product() {
         return sub_product;
@@ -89,6 +99,14 @@ public class Product {
         this.has_subproduct = has_subproduct;
     }
 
+    public String getPath() {
+        return path;
+    }
+
+    public void setPath(String path) {
+        this.path = path;
+    }
+
     public Product(String id, String name, String category, double price) {
         this.id = id;
         this.name = name;
@@ -96,7 +114,6 @@ public class Product {
         this.price = price;
         this.has_subproduct = false;
     }
-
 
     public Product(String name, String category, Map<String, Integer> sub_product){
         this.name = name;
