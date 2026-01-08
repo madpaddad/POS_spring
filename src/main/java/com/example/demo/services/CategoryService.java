@@ -11,11 +11,9 @@ import com.example.demo.model.Product;
 import com.example.demo.repository.CategoryRepository;
 import com.example.demo.repository.ProductRepository;
 import javassist.tools.rmi.ObjectNotFoundException;
-import org.apache.coyote.Response;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.graphql.GraphQlProperties;
 import org.springframework.data.mongodb.core.FindAndModifyOptions;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
@@ -23,18 +21,12 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
-import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import reactor.core.scheduler.Schedulers;
-import com.mongodb.client.result.UpdateResult;
 
-import java.util.IllegalFormatCodePointException;
 import java.util.List;
 
 
@@ -139,13 +131,7 @@ public class CategoryService {
                 )
                 .toBodilessEntity()
                 .then();
-                // Map successful status to ResponseEntity<HttpStatus> (which is a form of Object)
-//                .map(response -> ApiResponse.success(null, "បង្កើតជោគជ័យ"))
-//                .onErrorResume(throwable -> {
-//                    return ApiResponse.error(throwable.getMessage());
-//                });
-//                .thenReturn(create)
-//                .onErrorMap(throwable -> new Throwable()).thenReturn(throwable);
+        // Map successful status to ResponseEntity<HttpStatus> (which is a form of Object)
     }
 
 

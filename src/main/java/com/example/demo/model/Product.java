@@ -31,6 +31,9 @@ public class Product {
     private String path;
 
     @Field
+    private Boolean is_available;
+
+    @Field
     private Map<String, Integer> sub_product = new HashMap<>(); 
 
 
@@ -70,6 +73,13 @@ public class Product {
         this.category = category;
     }
 
+    public Boolean getIs_available() {
+        return is_available;
+    }
+
+    public void setIs_available(Boolean is_available) {
+        this.is_available = is_available;
+    }
 
     public Map<String, Integer> getsub_product() {
         return sub_product;

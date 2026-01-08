@@ -25,7 +25,7 @@ public class FileController {
 
 
 //    public FileService
-    @PostMapping
+//    @PostMapping
 //    public String get(){
 //        log.info("calling to 8088");
 //        return fileService.callHi();
@@ -33,10 +33,10 @@ public class FileController {
 
 
 
-    public ResponseEntity<String> callFileService(
-            @RequestPart("file") MultipartFile file,
-            @RequestPart("data") Create data
-    ) {
-        return ResponseEntity.ok(fileService.callHi(data, file));
-    }
+//    public ResponseEntity<String> callFileService(
+//            @RequestPart("file") MultipartFile file,
+//            @RequestPart("data") Create data
+//    ) {
+//        return ResponseEntity.ok(fileService.create(data, file));
+//    }
 }

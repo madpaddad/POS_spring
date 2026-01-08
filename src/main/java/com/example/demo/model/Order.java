@@ -81,8 +81,8 @@ public class Order {
 
     public static List<Order> seedOrder(){
         return Arrays.asList(
-                new Order("1", "2", OrderStatus.completed, Arrays.asList("1", "2")),
-                new Order("2", "3", OrderStatus.completed, Arrays.asList("3", "4"))
+                new Order("1", "2", OrderStatus.COMPLETED, Arrays.asList("1", "2")),
+                new Order("2", "3", OrderStatus.COMPLETED, Arrays.asList("3", "4"))
         );
     }
 }

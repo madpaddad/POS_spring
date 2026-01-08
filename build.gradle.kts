@@ -19,19 +19,20 @@ repositories {
 	mavenCentral()
 }
 
-dependencyManagement{
-    imports {
-        mavenBom("org.springframework.cloud:spring-cloud-dependencies:2024.0.0")
+    dependencyManagement{
+        imports {
+            mavenBom("org.springframework.cloud:spring-cloud-dependencies:2024.0.0")
+        }
     }
-}
-dependencies {
-    implementation("com.auth0:java-jwt:4.5.0")
-	implementation("org.springframework.boot:spring-boot-starter-web")
-	implementation("org.springframework.boot:spring-boot-starter-data-mongodb")
-	implementation(platform("io.mongock:mongock-bom:5.4.1"))
+    dependencies {
+        implementation("com.auth0:java-jwt:4.5.0")
+        implementation("org.springframework.boot:spring-boot-starter-web")
+        implementation("org.springframework.boot:spring-boot-starter-data-mongodb")
+        implementation(platform("io.mongock:mongock-bom:5.4.1"))
     implementation("org.springframework.boot:spring-boot-starter-data-mongodb-reactive")
 	implementation("io.mongock:mongock-springboot-v3:5.4.1")
     implementation("io.mongock:mongock-springboot-v3")
+//    implementation("org.springframework.boot:spring-boot-docker-compose")
     implementation("org.springframework.boot:spring-boot-starter-webflux")
 //    implementation("org.springframework.cloud:spring-cloud-starter-config")
     implementation("io.mongock:mongodb-springdata-v4-driver")
