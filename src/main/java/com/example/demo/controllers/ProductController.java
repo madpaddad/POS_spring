@@ -40,18 +40,30 @@ public class ProductController {
 //            public ResponseEntity<String> create (
             @RequestPart(value = "product", required = true) ProductDTO product,
             @RequestPart(value = "file", required = true) MultipartFile file) {
-//        return ResponseEntity.ok("Hello");
         return this.productService.create(product, file);
     }
 
-    @PutMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    @ResponseBody
-    public ResponseEntity<ApiResponse<ProductDTO>> update(
-            @RequestParam(required = true) String id,
-            @RequestBody(required = false) ProductDTO product,
-            @RequestPart(value = "image", required = false) MultipartFile file){
+//    @PutMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+//    @ResponseBody
+//    public Mono<ApiResponse<ProductDTO>> update(
+//            @RequestParam(required = true) String id,
+//            @RequestPart(value = "product", required = true) ProductDTO product,
+//            @RequestPart(value = "image", required = false) MultipartFile file){
+//
+//        log.info("Product request{}", product);
+//        log.info("File request{}", file);
+//        return this.productService.update(id, product, file);
+//    }
+    @PutMapping(value = "/update", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
+    public Mono<ApiResponse<ProductDTO>> update(
+            @RequestParam String id,
+            @RequestPart("product") ProductDTO product,
+            @RequestPart(value = "image", required = false) MultipartFile file
+    ) {
+        log.info("processing request {}", product);
         return this.productService.update(id, product, file);
     }
+
 
     @DeleteMapping()
     @ResponseBody
