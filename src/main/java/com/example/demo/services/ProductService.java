@@ -1,18 +1,15 @@
 package com.example.demo.services;
 
 import com.example.demo.dto.file.Create;
+import com.example.demo.dto.file.UpdateFileDTO;
 import com.example.demo.dto.order.ProductDTO;
-import com.example.demo.dto.product.ProductFile;
 import com.example.demo.helper.ApiResponse;
-import com.example.demo.helper.CustomerMapper;
 import com.example.demo.helper.ProductMapper;
 import com.example.demo.model.Category;
 import com.example.demo.model.Product;
 import com.example.demo.repository.CategoryRepository;
 import com.example.demo.repository.ProductRepository;
 
-import com.example.demo.share.MongoQuery;
-import org.apache.coyote.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
@@ -58,14 +55,13 @@ public class ProductService {
     }
 
     /**********************************************************************
-    Get Product
-    ***********************************************************************/
-
+     Get Product
+     ***********************************************************************/
     public ResponseEntity<List<Product>> get(String category_id) {
 
         List<Product> productList;
 
-        if(category_id == null){
+        if (category_id == null) {
             productList = productRepository.findAll();
         } else {
             productList = productRepository.findByCategoryIdCustom(category_id);
@@ -85,7 +81,7 @@ public class ProductService {
     public Mono<ApiResponse<ProductDTO>> create(ProductDTO productDTO, MultipartFile file) {
 
         if (productDTO.ishas_subproducts()) {
-            if (productDTO.getSub_products() == null){
+            if (productDTO.getSub_products() == null) {
                 throw new IllegalArgumentException("មិនមានទិន្នន័យគ្រប់គ្រាន់ដើម្បីបញ្ចូល");
             }
         }
@@ -94,7 +90,7 @@ public class ProductService {
         Mono<Boolean> exist = reactiveMongoTemplate.exists(query, Category.class);
 
         return exist.flatMap(e -> {
-            if(!e) {
+            if (!e) {
                 return Mono.error(new IllegalArgumentException("Category does not exist"));
             }
 
@@ -108,18 +104,18 @@ public class ProductService {
             return pathMono
                     .map(path -> {
 
-                        /***************
+                        /*
                         If path exists it will return back as a path:
                         Example:
                         {
                             "path": "fastfood/Product5"
                         }
-                        *****************/
-                        if(path != null && !path.isBlank()){
-                            product.setPath(path);
-                        }
-                        return product;
-                    }
+                        */
+                                if (path != null && !path.isBlank()) {
+                                    product.setPath(path);
+                                }
+                                return product;
+                            }
                     )
                     .flatMap(d -> reactiveMongoTemplate.save(d))
                     .map(d -> ApiResponse.success(productDTO, "ទិន្នន័យបានបង្កើត"))
@@ -129,67 +125,74 @@ public class ProductService {
     }
 
     /**********************************************************************
-     Update Product
+     Update Product:
+     ** MINIO DOES NOT ALLOW BOTH OBJECT AND BUCKET NAME CHANGING **
+
+     - Updating Image and Name: Find the old image, remove, and replace with the new name and new path;
+     - Updating Image : Find the old image, remove, but keep the same name
+     - Updating Name  : Just update the name, path keep the same
      ***********************************************************************/
 
-    public ResponseEntity<ApiResponse<ProductDTO>> update(String id, ProductDTO product, MultipartFile file){
+    public Mono<ApiResponse<ProductDTO>> update(String id, ProductDTO productDTO, MultipartFile file) {
 
-        try {
-
-            if(id.isEmpty()){
-                throw new IllegalArgumentException("no ID found");
-            }
-            Product data = productRepository.findById(id).orElse(null);
-
-            if(data == null){
-                throw new IllegalArgumentException("data is null");
-            }
-
-            mapper.update(product, data);
-
-            // update product picture is any:
-            if(!file.isEmpty()){
-
-                MultipartBodyBuilder bodyBuilder = new MultipartBodyBuilder();
-
-                // Image for update
-                bodyBuilder.part(
-                        "image", file.getResource())
-                                .contentType(MediaType.parseMediaType(file.getContentType()));
-
-                // Bucket or category name to find and replace it with the name
-                bodyBuilder.part("name", product.getName());
-                bodyBuilder.part("category", data.getCategory());
-
-                webClient.post()
-                        .uri("/api/fileService/product")
-                        .bodyValue(bodyBuilder)
-                        .retrieve();
-            }
+        Mono<Product> product = reactiveMongoTemplate.findById(id, Product.class);
 
 
+        // Get the product and update the path with the new name
+        Mono<String> filepath = Mono.justOrEmpty(file)
+                .filter(f -> !f.isEmpty())
+                .zipWith(product)
+                .flatMap(tuple -> {
+                    log.info("Tuple name: {}", tuple.getT2().getName());
+                    UpdateFileDTO updateFileDTO = new UpdateFileDTO(tuple.getT2().getName(), productDTO.getName());
 
-            Product savedProduct = productRepository.save(data);
+                    return fileService.update(updateFileDTO, tuple.getT1());
+                });
 
-            ApiResponse<ProductDTO> response = ApiResponse.success(product, "មានក្នុងស្តុក");
-            return ResponseEntity.ok(response);
-        } catch (Exception e){
 
-            ApiResponse<ProductDTO> response = ApiResponse.error("គ្មានផលិតផលក្នុងស្តុក");
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        log.info("{}", productDTO.getName());
+        return product
+                .flatMap(p -> {
 
-        }
+                    Query query = new Query(Criteria.where("_id").is(id));
+                    Update update = new Update();
+
+                    return filepath
+                            .doOnNext(path -> update.set("path", filepath))
+                            .then(Mono.defer(() -> {
+                                if (productDTO.getName() != null) {
+                                    log.info("name{}", productDTO.getName());
+                                    update.set("name", productDTO.getName());
+                                }
+                                if (productDTO.getPrice() != null) {
+                                    update.set("price", productDTO.getPrice());
+                                }
+                                if (productDTO.getCategory() != null) {
+                                    update.set("category", productDTO.getCategory());
+                                }
+                                if (productDTO.getIs_available() != null) {
+                                    update.set("category", productDTO.getIs_available());
+                                }
+
+                                return reactiveMongoTemplate.updateFirst(query, update, Product.class);
+                            }))
+                            .map(r ->
+                            {
+                                return ApiResponse.success(productDTO, "ព៏ត៌មានកែប្រែ");
+                            })
+                            .onErrorReturn(ApiResponse.error("មានបញ្ហាក្នុងការកែប្រែ"));
+                });
     }
 
     /**********************************************************************
      Delete Product
      ***********************************************************************/
 
-    public ResponseEntity<ApiResponse<String>> delete(String id){
+    public ResponseEntity<ApiResponse<String>> delete(String id) {
 
         try {
 
-            if (id.isEmpty()){
+            if (id.isEmpty()) {
                 throw new IllegalArgumentException("no ID found");
             }
 
@@ -205,6 +208,7 @@ public class ProductService {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
         }
     }
-
 }
+
+
 

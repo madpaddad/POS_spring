@@ -8,6 +8,7 @@ import java.util.Map;
 public class ProductDTO {
     private String id;
     private String name;
+    private String new_name;
     private String category;
     private Double price;
     private Boolean is_available;
