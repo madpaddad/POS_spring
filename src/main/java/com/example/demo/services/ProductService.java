@@ -143,14 +143,27 @@ public class ProductService {
                 .filter(f -> !f.isEmpty())
                 .zipWith(product)
                 .flatMap(tuple -> {
-                    log.info("Tuple name: {}", tuple.getT2().getName());
-                    UpdateFileDTO updateFileDTO = new UpdateFileDTO(tuple.getT2().getName(), productDTO.getName());
+
+                    String name = productDTO != null && productDTO.getName() != null
+                            ? productDTO.getName()
+                            : tuple.getT2().getName();
+
+                    String category = productDTO != null && productDTO.getCategory() != null
+                            ? productDTO.getCategory()
+                            : tuple.getT2().getCategory();
+
+
+
+                    String path     = tuple.getT2().getPath();
+
+                    log.info("UpdateFileDTO values -> name: {}, category: {}, path: {}",
+                            name, category, path);
+                    UpdateFileDTO updateFileDTO = new UpdateFileDTO(name, category, path);
 
                     return fileService.update(updateFileDTO, tuple.getT1());
                 });
 
 
-        log.info("{}", productDTO.getName());
         return product
                 .flatMap(p -> {
 
@@ -160,26 +173,26 @@ public class ProductService {
                     return filepath
                             .doOnNext(path -> update.set("path", filepath))
                             .then(Mono.defer(() -> {
-                                if (productDTO.getName() != null) {
-                                    log.info("name{}", productDTO.getName());
-                                    update.set("name", productDTO.getName());
-                                }
-                                if (productDTO.getPrice() != null) {
-                                    update.set("price", productDTO.getPrice());
-                                }
-                                if (productDTO.getCategory() != null) {
-                                    update.set("category", productDTO.getCategory());
-                                }
-                                if (productDTO.getIs_available() != null) {
-                                    update.set("category", productDTO.getIs_available());
-                                }
+
+                                    if (productDTO != null && productDTO.getName() != null) {
+                                        log.info("name{}", productDTO.getName());
+                                        update.set("name", productDTO.getName());
+                                    }
+                                    if (productDTO != null && productDTO.getPrice() != null) {
+                                        update.set("price", productDTO.getPrice());
+                                    }
+                                    if (productDTO != null && productDTO.getCategory() != null) {
+                                        update.set("category", productDTO.getCategory());
+                                    }
+                                    if (productDTO != null && productDTO.getIs_available() != null) {
+                                        update.set("category", productDTO.getIs_available());
+                                    }
+
+
 
                                 return reactiveMongoTemplate.updateFirst(query, update, Product.class);
                             }))
-                            .map(r ->
-                            {
-                                return ApiResponse.success(productDTO, "ព៏ត៌មានកែប្រែ");
-                            })
+                            .thenReturn(ApiResponse.success(productDTO, "ព៏ត៌មានកែប្រែ"))
                             .onErrorReturn(ApiResponse.error("មានបញ្ហាក្នុងការកែប្រែ"));
                 });
     }

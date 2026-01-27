@@ -9,7 +9,7 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-@ChangeUnit(id="reseed", order = "002", author = "mongock")
+@ChangeUnit(id="reseed1", order = "002", author = "mongock")
     public class DataBaseChangeLog {
 
     private final PasswordEncoder passwordEncoder;

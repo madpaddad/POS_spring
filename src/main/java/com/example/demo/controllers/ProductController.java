@@ -57,7 +57,7 @@ public class ProductController {
     @PutMapping(value = "/update", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
     public Mono<ApiResponse<ProductDTO>> update(
             @RequestParam String id,
-            @RequestPart("product") ProductDTO product,
+            @RequestPart(value = "product", required = false) ProductDTO product,
             @RequestPart(value = "image", required = false) MultipartFile file
     ) {
         log.info("processing request {}", product);
