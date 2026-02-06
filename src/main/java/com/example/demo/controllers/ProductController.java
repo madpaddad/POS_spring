@@ -54,7 +54,7 @@ public class ProductController {
 //        log.info("File request{}", file);
 //        return this.productService.update(id, product, file);
 //    }
-    @PutMapping(value = "/update", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
+    @PutMapping(value = "/update", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
     public Mono<ApiResponse<ProductDTO>> update(
             @RequestParam String id,
             @RequestPart(value = "product", required = false) ProductDTO product,

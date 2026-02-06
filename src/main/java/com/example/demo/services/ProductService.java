@@ -163,6 +163,15 @@ public class ProductService {
                     return fileService.update(updateFileDTO, tuple.getT1());
                 });
 
+        log.info("I RECEIVED BACK YOUR FILE PATH{}", filepath);
+
+        Mono.just(filepath)
+                .flatMap(path -> {
+                   Query query = new Query(Criteria.where("_id").is(id));
+                   Update update = new Update().set("path", path);
+
+                   return reactiveMongoTemplate.updateFirst(query, update, Product.class);
+                });
 
         return product
                 .flatMap(p -> {
@@ -170,30 +179,24 @@ public class ProductService {
                     Query query = new Query(Criteria.where("_id").is(id));
                     Update update = new Update();
 
-                    return filepath
-                            .doOnNext(path -> update.set("path", filepath))
-                            .then(Mono.defer(() -> {
 
-                                    if (productDTO != null && productDTO.getName() != null) {
-                                        log.info("name{}", productDTO.getName());
-                                        update.set("name", productDTO.getName());
-                                    }
-                                    if (productDTO != null && productDTO.getPrice() != null) {
-                                        update.set("price", productDTO.getPrice());
-                                    }
-                                    if (productDTO != null && productDTO.getCategory() != null) {
-                                        update.set("category", productDTO.getCategory());
-                                    }
-                                    if (productDTO != null && productDTO.getIs_available() != null) {
-                                        update.set("category", productDTO.getIs_available());
-                                    }
+                    if (productDTO != null && productDTO.getName() != null) {
+                        log.info("name{}", productDTO.getName());
+                        update.set("name", productDTO.getName());
+                    }
+                    if (productDTO != null && productDTO.getPrice() != null) {
+                        update.set("price", productDTO.getPrice());
+                    }
+                    if (productDTO != null && productDTO.getCategory() != null) {
+                        update.set("category", productDTO.getCategory());
+                    }
 
-
-
-                                return reactiveMongoTemplate.updateFirst(query, update, Product.class);
-                            }))
-                            .thenReturn(ApiResponse.success(productDTO, "ព៏ត៌មានកែប្រែ"))
-                            .onErrorReturn(ApiResponse.error("មានបញ្ហាក្នុងការកែប្រែ"));
+                    return reactiveMongoTemplate.updateFirst(query, update, Product.class);
+                })
+                .thenReturn(ApiResponse.success(productDTO, "ព៏ត៌មានកែប្រែ"))
+                .onErrorResume(e -> {
+                    log.error("Update failed", e);
+                    return Mono.just(ApiResponse.error("មានបញ្ហាក្នុងការកែប្រែ"));
                 });
     }
 
