@@ -7,6 +7,7 @@ import io.mongock.runner.springboot.EnableMongock;
 import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 
+
 @EnableMongock
 @SpringBootApplication(exclude = SecurityAutoConfiguration.class)
 public class PosApplication {

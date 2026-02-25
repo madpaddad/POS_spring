@@ -34,6 +34,8 @@ repositories {
     implementation("io.mongock:mongock-springboot-v3")
 //    implementation("org.springframework.boot:spring-boot-docker-compose")
     implementation("org.springframework.boot:spring-boot-starter-webflux")
+
+//    implementation("org.springframework.cloud:spring-cloud-starter-gateway")
 //    implementation("org.springframework.cloud:spring-cloud-starter-config")
     implementation("io.mongock:mongodb-springdata-v4-driver")
     implementation("org.mapstruct:mapstruct:1.5.5.Final")

@@ -72,6 +72,11 @@ public class Order {
 
     }
 
+    public Order(String tableNo, OrderStatus orderStatus) {
+        this.tableNo = tableNo;
+        this.orderStatus = orderStatus;
+    }
+
     public Order(String id, String tableNo, OrderStatus orderStatus, Collection<String> orderItemsIds) {
         this.id = id;
         this.tableNo = tableNo;

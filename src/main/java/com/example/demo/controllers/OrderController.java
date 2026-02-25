@@ -6,6 +6,7 @@ import com.example.demo.services.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Mono;
 
 @RestController
 @RequestMapping("/api/order")
@@ -26,5 +27,11 @@ public class OrderController {
     public ResponseEntity<orderDTO> get(@RequestParam(required = true) String id) {
         System.out.println("Requested order ID: " + id);
         return this.orderService.get(id);
+    }
+
+    @PostMapping()
+    @ResponseBody
+    public Mono<Boolean> post(@RequestParam(required = true) String table){
+        return this.orderService.create(table);
     }
 }

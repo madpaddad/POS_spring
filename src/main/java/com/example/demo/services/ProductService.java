@@ -164,35 +164,34 @@ public class ProductService {
                 });
 
         log.info("I RECEIVED BACK YOUR FILE PATH{}", filepath);
-
-        Mono.just(filepath)
+        return filepath
                 .flatMap(path -> {
-                   Query query = new Query(Criteria.where("_id").is(id));
-                   Update update = new Update().set("path", path);
+                            Query query = new Query(Criteria.where("_id").is(id));
+                            Update update = new Update().set("path", path);
 
-                   return reactiveMongoTemplate.updateFirst(query, update, Product.class);
-                });
-
-        return product
-                .flatMap(p -> {
-
-                    Query query = new Query(Criteria.where("_id").is(id));
-                    Update update = new Update();
-
-
-                    if (productDTO != null && productDTO.getName() != null) {
-                        log.info("name{}", productDTO.getName());
-                        update.set("name", productDTO.getName());
-                    }
-                    if (productDTO != null && productDTO.getPrice() != null) {
-                        update.set("price", productDTO.getPrice());
-                    }
-                    if (productDTO != null && productDTO.getCategory() != null) {
-                        update.set("category", productDTO.getCategory());
-                    }
-
-                    return reactiveMongoTemplate.updateFirst(query, update, Product.class);
+                            log.info("Path received and update{}", path);
+                            return reactiveMongoTemplate.updateFirst(query, update, Product.class);
                 })
+                .then(product
+                        .flatMap(p -> {
+                            Query query = new Query(Criteria.where("_id").is(id));
+                            Update update = new Update();
+
+
+                            if (productDTO != null && productDTO.getName() != null) {
+                                log.info("name{}", productDTO.getName());
+                                update.set("name", productDTO.getName());
+                            }
+                            if (productDTO != null && productDTO.getPrice() != null) {
+                                update.set("price", productDTO.getPrice());
+                            }
+                            if (productDTO != null && productDTO.getCategory() != null) {
+                                update.set("category", productDTO.getCategory());
+                            }
+
+                            return reactiveMongoTemplate.updateFirst(query, update, Product.class);
+                        })
+                )
                 .thenReturn(ApiResponse.success(productDTO, "ព៏ត៌មានកែប្រែ"))
                 .onErrorResume(e -> {
                     log.error("Update failed", e);

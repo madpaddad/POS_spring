@@ -9,7 +9,7 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-@ChangeUnit(id="reseed1", order = "002", author = "mongock")
+@ChangeUnit(id="table", order = "002", author = "mongock")
     public class DataBaseChangeLog {
 
     private final PasswordEncoder passwordEncoder;
@@ -24,7 +24,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
         this.passwordEncoder = passwordEncoder;
     }
 
-    public List<String> tables = Arrays.asList("expense", "category", "guest", "order", "order_items", "product", "user");
+    public List<String> tables = Arrays.asList("expense", "category", "guest", "order", "order_items", "product", "user", "tableorder", "table");
 
     @BeforeExecution
     public void before() {
@@ -34,6 +34,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
         mongoTemplate.createCollection(Category.class);
         mongoTemplate.createCollection(OrderItem.class);
         mongoTemplate.createCollection(Order.class);
+        mongoTemplate.createCollection(TableOrder.class);
+        mongoTemplate.createCollection(Table.class);
     }
 
 
@@ -44,12 +46,14 @@ import org.springframework.security.crypto.password.PasswordEncoder;
         List<Product> products = Product.seedProduct();
         List<OrderItem> orderItems = OrderItem.seedOrder();
         List<Order> orders = Order.seedOrder();
+        List<Table> tables = Table.seedTable();
         List<User> users = User.seedUser(passwordEncoder);
         //data seeding
         categories.forEach(category -> mongoTemplate.save(category, "category"));
         products.forEach(product -> mongoTemplate.save(product, "product"));
         orderItems.forEach(order_item -> mongoTemplate.save(order_item, "order_items"));
         orders.forEach(order -> mongoTemplate.save(order, "order"));
+        tables.forEach(table -> mongoTemplate.save(table, "table"));
         users.forEach((user -> mongoTemplate.save(user, "user")));
 
     }

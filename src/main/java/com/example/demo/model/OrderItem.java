@@ -1,5 +1,6 @@
 package com.example.demo.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -27,8 +28,20 @@ public class OrderItem {
     @Field
     private double total;
 
+    public String getOrder_id() {
+        return order_id;
+    }
+
+    public void setOrder_id(String order_id) {
+        this.order_id = order_id;
+    }
+
+    @Field
+    private String order_id;
+
 //    @Transient
-    private List<Product> product;
+    @JsonIgnore
+//    private List<Product> product;
 
 
     public double getTotal() {
@@ -39,13 +52,13 @@ public class OrderItem {
         this.total = total;
     }
 
-    public List<Product> getProducts() {
-        return product;
-    }
+//    public List<Product> getProducts() {
+//        return product;
+//    }
 
-    public void setProducts(List<Product> product) {
-        this.product = product;
-    }
+//    public void setProducts(List<Product> product) {
+//        this.product = product;
+//    }
 
 
     public String getId() {
