@@ -1,43 +1,67 @@
 package com.example.demo.services;
 
-import com.example.demo.model.Order;
-import com.example.demo.model.OrderStatus;
-import com.example.demo.model.Table;
-import com.example.demo.model.TableOrder;
+import com.example.demo.helper.ApiResponse;
+import com.example.demo.model.*;
+import com.example.demo.repository.OrderItemRepository;
 import com.example.demo.repository.OrderRepository;
+import com.mongodb.BasicDBObject;
 import org.bson.types.ObjectId;
+import org.reactivestreams.Publisher;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
+import org.springframework.data.mongodb.core.aggregation.Aggregation;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import com.example.demo.dto.order.orderDTO;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import org.bson.Document;
 import java.util.List;
 import java.util.Optional;
+
+import static org.springframework.data.mongodb.core.aggregation.Aggregation.newAggregation;
+import static org.springframework.data.mongodb.core.aggregation.Aggregation.*;
 
 @Service
 public class OrderService {
 
     private final OrderRepository orderRepository;
     private final ReactiveMongoTemplate reactiveMongoTemplate;
-    public OrderService(OrderRepository orderRepository, ReactiveMongoTemplate reactiveMongoTemplate) {
+    private final OrderItemRepository orderItemRepository;
+
+    public OrderService(
+            OrderRepository orderRepository,
+            ReactiveMongoTemplate reactiveMongoTemplate,
+            OrderItemRepository orderItemRepository) {
+
         this.orderRepository = orderRepository;
         this.reactiveMongoTemplate = reactiveMongoTemplate;
+        this.orderItemRepository = orderItemRepository;
     }
 
-    public ResponseEntity<orderDTO> get(String id) {
+    public Mono<ApiResponse<Document>> get(String id) {
 
-        System.out.println("Requested service order ID: " + id);
-        orderDTO orderList = orderRepository.findOrderById(id);
+        Aggregation aggregation  = newAggregation(
+                Aggregation.lookup("product", "product_id", "_id", "product"),
+                        unwind("product"),
+                        group("order_id")
+                        .sum("total").as("total_price")
+                        .push(
+                                new BasicDBObject()
+                                        .append("product", "$product.name")
+                                        .append("quantity", "$quantity")
+                                        .append("total", "$total")
+                        ).as("products")
+        );
 
-        if (orderList == null) {
-            return ResponseEntity.notFound().build();
-        }
+        Flux<Document> results = reactiveMongoTemplate.aggregate(aggregation, "order_items", Document.class);
+        return results
+                .next()
+                .map(document -> ApiResponse.success(document, "True"));
 
-        return ResponseEntity.ok(orderList);
 
     }
 

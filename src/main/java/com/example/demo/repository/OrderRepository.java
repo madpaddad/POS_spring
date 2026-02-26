@@ -3,6 +3,7 @@ package com.example.demo.repository;
 import com.example.demo.model.Order;
 import org.springframework.data.mongodb.repository.Aggregation;
 import org.springframework.data.mongodb.repository.MongoRepository;
+import org.springframework.data.mongodb.repository.ReactiveMongoRepository;
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
 
 import java.util.List;
@@ -12,7 +13,7 @@ import com.example.demo.dto.order.orderDTO;
 //import java.util.List;
 
 @EnableMongoRepositories()
-public interface OrderRepository extends MongoRepository<Order, String> {
+public interface OrderRepository extends ReactiveMongoRepository<Order, String> {
 
         @Aggregation(pipeline = {
                 "{ $match: { _id: ?0 } }",
