@@ -2,6 +2,7 @@ package com.example.demo.services;
 
 import com.example.demo.helper.ApiResponse;
 import com.example.demo.model.OrderItem;
+import com.example.demo.model.Product;
 import com.example.demo.model.TableOrder;
 import org.springframework.boot.autoconfigure.graphql.GraphQlProperties;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
@@ -11,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import javax.naming.InvalidNameException;
@@ -34,13 +36,28 @@ public class OrderItemsService {
      */
     public Mono<ApiResponse<List<OrderItem>>> create(String id, List<OrderItem> orderItems) {
         Mono<TableOrder> order = reactiveMongoTemplate.findById(id, TableOrder.class);
+
         return order.flatMap(
                 t_order -> {
 
-                    orderItems.forEach(item -> {
-                        item.setOrder_id(t_order.getOrder());
-                    });
-                    return reactiveMongoTemplate.insertAll(orderItems).collectList();
+                    Flux<OrderItem> items = Flux.fromIterable(orderItems)
+                            .flatMap(item -> reactiveMongoTemplate
+                                    .findById(item.getProduct_id(), Product.class)
+                                    .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND, "Product not found")))
+                                    .map(product -> {
+                                        double price = product.getPrice();
+                                        double total = price * item.getQuantity();
+                                        log.info("Price from product is, {} {}", price, total);
+
+
+                                        item.setTotal(total);
+                                        item.setOrder_id(t_order.getOrder());
+
+                                        return item;
+                                    })
+                                    .flatMap(reactiveMongoTemplate::save));
+
+                    return items.collectList();
                 })
                 .map( item -> {
                             return ApiResponse.success(orderItems, "saved");
@@ -49,23 +66,5 @@ public class OrderItemsService {
                 .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND, "order not found")))
                 .onErrorResume(e -> Mono.just(ApiResponse.error("failed " + e.getMessage() )));
     }
-//                .flatMap(tableOrder -> {
-
-//                    orderItems.forEach(item ->
-//                            {
-//                                item.setId(null);
-//                                item.setOrder_id(tableOrder.getOrder());
-//                                log.info("each item is setting{}: ", item);
-//                            }
-//                    );
-//
-//                    return Mono.just(ApiResponse.success(orderItems, "hello"));
-//                            reactiveMongoTemplate.insertAll(orderItems)
-//                            .collectList()
-//                            .map(savedItem -> ApiResponse.success(savedItem, "ជោគជ័យ"));
-//                })
-//                .doOnError(e -> log.error("Error creating order items: ", e)) // See the real error!
-//                .onErrorResume(e -> Mono.just(ApiResponse.error("Failed: " + e.getMessage())));
-//    }
 
 }

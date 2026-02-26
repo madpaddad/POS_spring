@@ -24,7 +24,7 @@ public class OrderController {
 
     @GetMapping()
     @ResponseBody
-    public ResponseEntity<orderDTO> get(@RequestParam(required = true) String id) {
+    public ResponseEntity<orderDTO> get(@RequestParam(required = false) String id) {
         System.out.println("Requested order ID: " + id);
         return this.orderService.get(id);
     }
