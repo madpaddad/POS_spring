@@ -37,54 +37,48 @@ public class OrderItemsService {
     - Check for if the TableOrder exist (id) to reference if there is an order from that
     - Create an orderItems to the table and reference to the order
      */
-    public Mono<ApiResponse<Product>> create(String id, UpdateOrderItemDTO orderItems) {
+    public Mono<ApiResponse<UpdateOrderItemDTO>> create(String id, UpdateOrderItemDTO orderItems) {
+
+
         Mono<TableOrder> order = reactiveMongoTemplate.findById(id, TableOrder.class);
 
         return reactiveMongoTemplate.findById(id, TableOrder.class)
                 .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND, "Product Not found")))
-                .then(Mono.just(orderItems.getProduct_id()))
-                .flatMap(product_id -> reactiveMongoTemplate.findById(product_id, Product.class)
-                )
-                .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND, "Product not exist")))
-                .flatMap(product -> Mono.just(ApiResponse.success(product, "hello")));
-//                t_order -> {Mono.map(
-//                            orderItems -> reactiveMongoTemplate
-//                                    .findById(orderItems.getProduct_id(), Product.class)
-//                                    .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND, "Product not found")))
-//                                    .map(product -> {
-//                                        double price = product.getPrice();
-//                                        double total = price * item.getQuantity();
-//                                        log.info("Price from product is, {} {}", price, total);
-//
-//                                        // Checking if the product has its variant
-//                                        if(product.isHas_subproduct()){
-//                                            Map<String, Double> variants = product.getsub_product();
-//
-//                                            if(!variants.containsKey(orderItems.getVariant())){
-//                                                return Mono.error(new RuntimeException("Invalid variant"));
-//                                            }
-//
-//                                            price = variants.getprice();
-//                                        }
-//
-//                                        item.setTotal(total);
-//                                        item.setOrder_id(t_order.getOrder());
-//
-//
-//
-//                                        return item;
-//                                    })
-//                                    .flatMap(reactiveMongoTemplate::save));
-//
-//                    return items.collectList();
-//                })
-//                .map( item -> {
-//                            return ApiResponse.success(orderItems, "saved");
-//                }
-//                )
-//                .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND, "order not found")))
-//                .onErrorResume(e -> Mono.just(ApiResponse.error("failed " + e.getMessage() )));
+                .flatMap(tableOrder -> {
+
+                    return reactiveMongoTemplate.findById(orderItems.getProduct_id(), Product.class)
+                            .switchIfEmpty(Mono.error(new ResponseStatusException(
+                                    HttpStatus.NOT_FOUND, "Product not exist")))
+                            .flatMap(product -> {
+
+                                double price;
+
+                                if (product.isHasSubproduct()) {
+                                    Map<String, Integer> variants = product.getsub_product();
+
+                                    if (!variants.containsKey(orderItems.getVariant())) {
+                                        return Mono.error(new RuntimeException("Invalid variant"));
+                                    }
+
+                                    price = variants.get(orderItems.getVariant());
+                                } else {
+                                    price = product.getPrice();
+                                }
+
+                                double total = price * orderItems.getQuantity();
+
+                                OrderItem orderitem = new OrderItem();
+                                orderitem.setProduct_id(product.getId());
+                                orderitem.setTotal(total);
+                                orderitem.setOrder_id(tableOrder.getOrder());
+
+                                return reactiveMongoTemplate.save(orderitem)
+                                        .map(saved -> ApiResponse.success(orderItems, "created to cart"));
+                            });
+                });
     }
+
+
 
     public Mono<ApiResponse<OrderItem>> update(String id, OrderItem orderItem){
 
