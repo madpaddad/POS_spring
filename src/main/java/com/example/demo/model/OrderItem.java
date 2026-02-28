@@ -29,6 +29,8 @@ public class OrderItem {
     @Field
     private double total;
 
+    private String variant;
+
     public String getOrder_id() {
         return order_id;
     }
@@ -96,6 +98,14 @@ public class OrderItem {
 
     public double getPrice() {
         return total;
+    }
+
+    public String getVariant() {
+        return variant;
+    }
+
+    public void setVariant(String variant) {
+        this.variant = variant;
     }
 
     public void setPrice(double total) {

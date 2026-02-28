@@ -74,6 +74,11 @@ public class Product {
         this.category = category;
     }
 
+
+    public void setSub_product(Map<String, Integer> sub_product) {
+        this.sub_product = sub_product;
+    }
+
     public Boolean getIs_available() {
         return is_available;
     }
@@ -92,7 +97,7 @@ public class Product {
 
     public Product(){}
 
-    public boolean isHas_subproduct() {
+    public boolean isHasSubproduct() {
         return has_subproduct;
     }
 

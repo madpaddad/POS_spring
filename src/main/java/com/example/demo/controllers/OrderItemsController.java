@@ -1,5 +1,6 @@
 package com.example.demo.controllers;
 
+import com.example.demo.dto.order.UpdateOrderItemDTO;
 import com.example.demo.helper.ApiResponse;
 import com.example.demo.model.OrderItem;
 import com.example.demo.model.Product;
@@ -27,8 +28,16 @@ public class OrderItemsController {
     * @ body List<Product> and its quantity
     */
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public Mono<ApiResponse<List<OrderItem>>> Create(@RequestParam() String id,
-                                                     @RequestBody() List<OrderItem> items){
+    public Mono<ApiResponse<Product>> create(@RequestParam() String id,
+                                                     @RequestBody() UpdateOrderItemDTO items){
         return orderItemsService.create(id, items);
+    }
+
+    @PutMapping()
+    public Mono<ApiResponse<OrderItem>> update(
+            @RequestParam() String id,
+            @RequestBody() OrderItem item
+    ){
+        return orderItemsService.update(id, item);
     }
 }

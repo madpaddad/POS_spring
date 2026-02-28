@@ -51,6 +51,7 @@ public class OrderService {
                         .sum("total").as("total_price")
                         .push(
                                 new BasicDBObject()
+                                        .append("id", new BasicDBObject("$toString", "$_id"))
                                         .append("product", "$product.name")
                                         .append("quantity", "$quantity")
                                         .append("total", "$total")
@@ -61,8 +62,6 @@ public class OrderService {
         return results
                 .next()
                 .map(document -> ApiResponse.success(document, "True"));
-
-
     }
 
     /*
