@@ -1,6 +1,7 @@
 package com.example.demo.model;
 
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.PersistenceCreator;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
@@ -73,6 +74,11 @@ public class Product {
         this.category = category;
     }
 
+
+    public void setSub_product(Map<String, Integer> sub_product) {
+        this.sub_product = sub_product;
+    }
+
     public Boolean getIs_available() {
         return is_available;
     }
@@ -91,7 +97,7 @@ public class Product {
 
     public Product(){}
 
-    public boolean isHas_subproduct() {
+    public boolean isHasSubproduct() {
         return has_subproduct;
     }
 
@@ -107,6 +113,7 @@ public class Product {
         this.path = path;
     }
 
+//    @PersistenceCreator
     public Product(String id, String name, String category, double price) {
         this.id = id;
         this.name = name;
@@ -114,6 +121,16 @@ public class Product {
         this.price = price;
         this.has_subproduct = false;
     }
+
+    public Product(String id, String name, String category, double price, String path) {
+        this.id = id;
+        this.name = name;
+        this.category = category;
+        this.price = price;
+        this.has_subproduct = false;
+        this.path = path;
+    }
+
 
     public Product(String name, String category, Map<String, Integer> sub_product){
         this.name = name;

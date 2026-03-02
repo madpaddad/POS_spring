@@ -2,12 +2,14 @@ package com.example.demo.dto.file;
 
 public class UpdateFileDTO {
     private String name;
-    private String new_name;
+    private String category;
+    private String path;
 
-
-    public UpdateFileDTO(String name, String new_name) {
+    public UpdateFileDTO(){}
+    public UpdateFileDTO(String name, String category, String path) {
         this.name = name;
-        this.new_name = new_name;
+        this.category = category;
+        this.path = path;
     }
 
     public String getName() {
@@ -18,11 +20,19 @@ public class UpdateFileDTO {
         this.name = name;
     }
 
-    public String getNew_name() {
-        return new_name;
+    public String getCategory() {
+        return category;
     }
 
-    public void setNew_name(String new_name) {
-        this.new_name = new_name;
+    public void setCategory(String new_name) {
+        this.category = new_name;
+    }
+
+    public String getPath() {
+        return path;
+    }
+
+    public void setPath(String path) {
+        this.path = path;
     }
 }

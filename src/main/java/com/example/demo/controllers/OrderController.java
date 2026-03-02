@@ -1,11 +1,17 @@
 package com.example.demo.controllers;
 import com.example.demo.dto.order.orderDTO;
 
+import com.example.demo.helper.ApiResponse;
 import com.example.demo.repository.OrderRepository;
 import com.example.demo.services.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
+
+import org.bson.Document;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/order")
@@ -23,8 +29,13 @@ public class OrderController {
 
     @GetMapping()
     @ResponseBody
-    public ResponseEntity<orderDTO> get(@RequestParam(required = true) String id) {
-        System.out.println("Requested order ID: " + id);
+    public Mono<ApiResponse<List<Document>>> get(@RequestParam(required = false) String id) {
         return this.orderService.get(id);
+    }
+
+    @PostMapping()
+    @ResponseBody
+    public Mono<Boolean> post(@RequestParam(required = true) String table){
+        return this.orderService.create(table);
     }
 }

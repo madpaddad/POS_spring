@@ -77,10 +77,10 @@ public class FileService {
                 .contentType(MediaType.APPLICATION_JSON);
 
         // File part
-        if (file != null && !file.isEmpty()) {
-            builder.part("file", file.getResource());
-        }
+        builder.part("file", file.getResource())
+                .contentType(MediaType.MULTIPART_FORM_DATA);
 
+        log.info("Body send to {}", builder.build());
         return webclient
                 .put()
                 .uri("/api/fileService/product")
