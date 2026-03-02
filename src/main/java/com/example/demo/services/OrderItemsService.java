@@ -13,6 +13,7 @@ import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Service;
+import org.springframework.web.ErrorResponseException;
 import org.springframework.web.server.ResponseStatusException;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -40,10 +41,8 @@ public class OrderItemsService {
     public Mono<ApiResponse<UpdateOrderItemDTO>> create(String id, UpdateOrderItemDTO orderItems) {
 
 
-        Mono<TableOrder> order = reactiveMongoTemplate.findById(id, TableOrder.class);
-
-        return reactiveMongoTemplate.findById(id, TableOrder.class)
-                .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND, "Product Not found")))
+        return reactiveMongoTemplate.findOne(new Query(Criteria.where("order").is(id)), TableOrder.class)
+                .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND, "Order Not found")))
                 .flatMap(tableOrder -> {
 
                     return reactiveMongoTemplate.findById(orderItems.getProduct_id(), Product.class)
@@ -51,13 +50,14 @@ public class OrderItemsService {
                                     HttpStatus.NOT_FOUND, "Product not exist")))
                             .flatMap(product -> {
 
+                                log.info("Your product is here{}", product.getsub_product());
                                 double price;
 
                                 if (product.isHasSubproduct()) {
                                     Map<String, Integer> variants = product.getsub_product();
 
                                     if (!variants.containsKey(orderItems.getVariant())) {
-                                        return Mono.error(new RuntimeException("Invalid variant"));
+                                        return Mono.just(ApiResponse.error("No variant product found"));
                                     }
 
                                     price = variants.get(orderItems.getVariant());
@@ -70,6 +70,7 @@ public class OrderItemsService {
                                 OrderItem orderitem = new OrderItem();
                                 orderitem.setProduct_id(product.getId());
                                 orderitem.setTotal(total);
+                                orderitem.setQuantity(orderItems.getQuantity());
                                 orderitem.setOrder_id(tableOrder.getOrder());
 
                                 return reactiveMongoTemplate.save(orderitem)

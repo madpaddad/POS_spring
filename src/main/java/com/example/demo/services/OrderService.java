@@ -42,26 +42,27 @@ public class OrderService {
         this.orderItemRepository = orderItemRepository;
     }
 
-    public Mono<ApiResponse<Document>> get(String id) {
+    public Mono<ApiResponse<List<Document>>> get(String id) {
 
         Aggregation aggregation  = newAggregation(
-                Aggregation.lookup("product", "product_id", "_id", "product"),
-                        unwind("product"),
-                        group("order_id")
-                        .sum("total").as("total_price")
-                        .push(
-                                new BasicDBObject()
-                                        .append("id", new BasicDBObject("$toString", "$_id"))
-                                        .append("product", "$product.name")
-                                        .append("quantity", "$quantity")
-                                        .append("total", "$total")
-                        ).as("products")
+                lookup("product", "product_id", "_id", "product"),
+                unwind("product", true),
+                group("order_id")
+                    .sum("total").as("total_price")
+                    .push(
+                            new BasicDBObject()
+                                    .append("id", new BasicDBObject("$toString", "$_id"))
+                                    .append("product", "$product.name")
+                                    .append("quantity", "$quantity")
+                                    .append("total", "$total")
+                    )
+                    .as("products")
         );
 
-        Flux<Document> results = reactiveMongoTemplate.aggregate(aggregation, "order_items", Document.class);
-        return results
-                .next()
-                .map(document -> ApiResponse.success(document, "True"));
+        // There are many data -> it will return as flux
+        return reactiveMongoTemplate.aggregate(aggregation, "order_items", Document.class)
+                .collectList()
+                .map(data -> ApiResponse.success(data, "GET"));
     }
 
     /*
@@ -80,7 +81,7 @@ public class OrderService {
                 .map(Order::getId)
                 .flatMap(id ->
                 {
-                    TableOrder tableorder = new TableOrder(id, table);
+                    TableOrder tableorder = new TableOrder(table, id);
                     return reactiveMongoTemplate.insert(tableorder);
 
                 })

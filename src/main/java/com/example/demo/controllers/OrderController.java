@@ -7,6 +7,7 @@ import com.example.demo.services.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import org.bson.Document;
@@ -28,7 +29,7 @@ public class OrderController {
 
     @GetMapping()
     @ResponseBody
-    public Mono<ApiResponse<Document>> get(@RequestParam(required = false) String id) {
+    public Mono<ApiResponse<List<Document>>> get(@RequestParam(required = false) String id) {
         return this.orderService.get(id);
     }
 
