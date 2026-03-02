@@ -81,30 +81,68 @@ public class OrderItemsService {
 
 
 
-    public Mono<ApiResponse<OrderItem>> update(String id, OrderItem orderItem){
+    /* Update an Order item will change each field of the item order:
+    @ param product : if a product is changed
+    @ param quantity: if a quantity is added up
 
-        Query query = new Query(Criteria.where("$id").is(id));
-        Update update = new Update();
+    ** Be careful in changing the total price as changing product could change the price and total of it
+    */
+    public Mono<ApiResponse<UpdateOrderItemDTO>> update(String id, UpdateOrderItemDTO updateOrderItemDTO){
 
-        if(orderItem != null && orderItem.getProduct_id()!= null){
-            update.set("product_id", orderItem.getProduct_id());
+        log.info("you are updating orderitem id: {}", updateOrderItemDTO.getProduct_id());
+
+        Mono<Product> productMono;
+
+        if (updateOrderItemDTO.getProduct_id() != null) {
+            productMono = reactiveMongoTemplate
+                    .findById(updateOrderItemDTO.getProduct_id(), Product.class);
+
+        } else {
+
+            // Use product from existing order item
+            productMono = reactiveMongoTemplate.findById(id, OrderItem.class)
+                    .switchIfEmpty(Mono.error(new RuntimeException("Order item not found")))
+                    .flatMap(orderItem ->
+                            reactiveMongoTemplate.findById(orderItem.getProduct_id(), Product.class)
+                    );
         }
 
-        if(orderItem != null && orderItem.getQuantity() > 0){
-            update.set("quantity", orderItem.getQuantity());
-        }
+        return productMono
+                .map(Product::getPrice)
+                .map( price -> {
 
-        return reactiveMongoTemplate.updateFirst(
-                    query,
-                    update,
-                    OrderItem.class
-                )
-                .map(updated -> {
-                    return ApiResponse.success(orderItem, "ផ្លាស់ប្ដូរជោគជ័យ");
+                    double total = price * updateOrderItemDTO.getQuantity();
+                    log.info("updating the update of the item");
+
+                    Update update = new Update();
+
+                    update.set("total", total);
+
+                    if(updateOrderItemDTO.getProduct_id() != null){
+                        update.set("product_id", updateOrderItemDTO.getProduct_id());
+                    }
+
+                    if(updateOrderItemDTO.getQuantity() > 0 && updateOrderItemDTO.getQuantity() != null){
+                        update.set("quantity", updateOrderItemDTO.getQuantity());
+                    }
+
+                    return update;
                 })
-                .onErrorResume(
-                        throwable -> Mono.just(ApiResponse.error(throwable.getMessage()))
-                );
+                .flatMap(upd ->
+                {
+                    log.info(" I am updating {}", upd);
+
+                    Query query = new Query(Criteria.where("_id").is(id));
+                    log.info("Query value is{}", query);
+                    return reactiveMongoTemplate.updateFirst(query, upd, OrderItem.class);
+                })
+                .map(result -> ApiResponse.success(updateOrderItemDTO, "update completed"))
+                .onErrorResume(e -> {
+                            if (e instanceof ErrorResponseException ex) {
+                                return Mono.just(ApiResponse.error("Update Failed: " + ex.getMessage()));
+                            }
+                            return Mono.just(ApiResponse.error("Update Failed: " + e.getMessage()));
+                });
     }
 
 }

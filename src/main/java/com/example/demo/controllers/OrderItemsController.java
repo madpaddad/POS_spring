@@ -6,6 +6,7 @@ import com.example.demo.model.OrderItem;
 import com.example.demo.model.Product;
 import com.example.demo.services.OrderItemsService;
 import com.example.demo.services.OrderService;
+import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
@@ -34,9 +35,10 @@ public class OrderItemsController {
     }
 
     @PutMapping()
-    public Mono<ApiResponse<OrderItem>> update(
-            @RequestParam() String id,
-            @RequestBody() OrderItem item
+    public Mono<ApiResponse<UpdateOrderItemDTO>> update(
+            @RequestParam("id") String id,
+
+            @RequestBody() UpdateOrderItemDTO item
     ){
         return orderItemsService.update(id, item);
     }
