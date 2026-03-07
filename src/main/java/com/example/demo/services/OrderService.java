@@ -1,5 +1,6 @@
 package com.example.demo.services;
 
+import com.example.demo.dto.order.UpdateOrderStatus;
 import com.example.demo.helper.ApiResponse;
 import com.example.demo.model.*;
 import com.example.demo.repository.OrderItemRepository;
@@ -44,23 +45,32 @@ public class OrderService {
 
     public Mono<ApiResponse<List<Document>>> get(String id) {
 
-        Aggregation aggregation  = newAggregation(
-                lookup("product", "product_id", "_id", "product"),
-                unwind("product", true),
-                group("order_id")
-                    .sum("total").as("total_price")
-                    .push(
-                            new BasicDBObject()
-                                    .append("id", new BasicDBObject("$toString", "$_id"))
-                                    .append("product", "$product.name")
-                                    .append("quantity", "$quantity")
-                                    .append("total", "$total")
-                    )
-                    .as("products")
-        );
+            Aggregation aggregation  = Aggregation.newAggregation(
+                    Aggregation.lookup("product", "product_id", "_id", "product"),
+                    Aggregation.unwind("product", true),
 
-        // There are many data -> it will return as flux
-        return reactiveMongoTemplate.aggregate(aggregation, "order_items", Document.class)
+                    Aggregation.group("order_id")
+                            .sum("total").as("total_price")
+                            .push(
+                                    new BasicDBObject()
+                                            .append("id", new BasicDBObject("$toString", "$_id"))
+                                            .append("product", "$product.name")
+                                            .append("quantity", "$quantity")
+                                            .append("total", "$total")
+                            )
+                            .as("products"),
+
+                    Aggregation.lookup("order", "order_id", "_id", "order"),
+                    Aggregation.unwind("order", true),
+                    Aggregation.addFields()
+                            .addField("order_status")
+                            .withValue("$order.orderStatus")
+                            .build()
+            );
+
+
+            // There are many data -> it will return as flux
+            return reactiveMongoTemplate.aggregate(aggregation, "order_items", Document.class)
                 .collectList()
                 .map(data -> ApiResponse.success(data, "GET"));
     }
@@ -96,5 +106,23 @@ public class OrderService {
                 )
                 .map(saved -> true)
                 .onErrorReturn(false);
+    }
+
+    /*
+    @ param id : Specify the order ID.
+
+    Making an update, updates the status of the order
+    */
+    public Mono<ApiResponse<Boolean>> update(String id, UpdateOrderStatus status){
+
+        return reactiveMongoTemplate.findById(id, Order.class)
+                .switchIfEmpty(Mono.error(new RuntimeException("Order Id not found")))
+                .flatMap(order -> {
+                    order.setOrderStatus(status.getStatus());
+
+                    return reactiveMongoTemplate.save(order);
+                })
+                .then(Mono.just(ApiResponse.success(true, "Update sucess")))
+                .onErrorResume( e-> Mono.just(ApiResponse.error("error can't proceed{}" + e.getMessage())));
     }
 }

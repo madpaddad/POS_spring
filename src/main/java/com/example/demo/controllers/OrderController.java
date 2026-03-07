@@ -1,7 +1,9 @@
 package com.example.demo.controllers;
+import com.example.demo.dto.order.UpdateOrderStatus;
 import com.example.demo.dto.order.orderDTO;
 
 import com.example.demo.helper.ApiResponse;
+import com.example.demo.model.OrderStatus;
 import com.example.demo.repository.OrderRepository;
 import com.example.demo.services.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,5 +39,14 @@ public class OrderController {
     @ResponseBody
     public Mono<Boolean> post(@RequestParam(required = true) String table){
         return this.orderService.create(table);
+    }
+
+    @PutMapping()
+    @ResponseBody
+    public Mono<ApiResponse<Boolean>> update(
+            @RequestParam String id,
+            @RequestBody UpdateOrderStatus status
+    ){
+        return this.orderService.update(id, status);
     }
 }
