@@ -145,4 +145,14 @@ public class OrderItemsService {
                 });
     }
 
+    /*
+    @param id: find order id to delete
+    */
+    public Mono<ApiResponse<Boolean>> delete(String id){
+        return reactiveMongoTemplate.findById(id, OrderItem.class)
+                .switchIfEmpty(Mono.error(new ErrorResponseException(HttpStatus.NOT_FOUND)))
+                .flatMap(reactiveMongoTemplate::remove)
+                .flatMap(reactiveMongoTemplate::save)
+                .thenReturn(ApiResponse.success(true, "deleted successfully"));
+    }
 }

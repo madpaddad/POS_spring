@@ -1,5 +1,6 @@
 package com.example.demo.controllers;
 
+import com.example.demo.dto.order.DeleteOrderItemDTO;
 import com.example.demo.dto.order.UpdateOrderItemDTO;
 import com.example.demo.helper.ApiResponse;
 import com.example.demo.model.OrderItem;
@@ -41,5 +42,13 @@ public class OrderItemsController {
             @RequestBody() UpdateOrderItemDTO item
     ){
         return orderItemsService.update(id, item);
+    }
+
+    @DeleteMapping
+    @ResponseBody
+    public Mono<ApiResponse<Boolean>> delete(
+            @RequestBody() DeleteOrderItemDTO deleteOrderItemDTO
+    ){
+        return orderItemsService.delete(deleteOrderItemDTO.getId());
     }
 }

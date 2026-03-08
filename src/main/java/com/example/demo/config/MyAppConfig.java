@@ -3,6 +3,8 @@ package com.example.demo.config;
 
 import com.example.demo.auth.AuthService;
 import jakarta.servlet.DispatcherType;
+//import org.springframework.cloud.gateway.route.RouteLocator;
+//import org.springframework.cloud.gateway.route.builder.RouteLocatorBuilder;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -79,5 +81,9 @@ public class MyAppConfig {
         return new RestTemplate();
     }
 
+//    @Bean
+//    public RouteLocator myRoutes(RouteLocatorBuilder builder){
+//        return builder.routes().build();
+//    }
 
 }

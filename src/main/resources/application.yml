@@ -20,11 +20,9 @@
 #    import: "configserver:" # Use the default name "configserver"
 #  application:
 #    name: file-service
-
-#server:
-#  port: 8080
-#
-#spring:
+spring:
+  main:
+    web-application-type: "none"
 #  application:
 #    name: api-gateway
 #
@@ -35,5 +33,9 @@
 #          uri: http://localhost:8080
 #          predicates:
 #            - Path=/files/** #Only forward requests whose URL path matches /files/** to this service.
+server:
+  port: 8080
+
+
 
 #spring.main.web-application-type=reactive
