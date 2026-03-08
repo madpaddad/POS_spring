@@ -1,5 +1,6 @@
 package com.example.demo.model;
 
+import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -13,7 +14,7 @@ import java.util.List;
 public class Order {
 
     @Id
-    private String id;
+    private ObjectId id;
 
     @Field
     private String tableNo;
@@ -28,7 +29,7 @@ public class Order {
     private List<OrderItem> orderItems;
 
 
-    public String getId() {
+    public ObjectId getId() {
         return id;
     }
 
@@ -48,7 +49,7 @@ public class Order {
         return orderItems;
     }
 
-    public void setId(String id) {
+    public void setId(ObjectId id) {
         this.id = id;
     }
 
@@ -77,7 +78,7 @@ public class Order {
         this.orderStatus = orderStatus;
     }
 
-    public Order(String id, String tableNo, OrderStatus orderStatus, Collection<String> orderItemsIds) {
+    public Order(ObjectId id, String tableNo, OrderStatus orderStatus, Collection<String> orderItemsIds) {
         this.id = id;
         this.tableNo = tableNo;
         this.orderStatus = orderStatus;
@@ -86,8 +87,8 @@ public class Order {
 
     public static List<Order> seedOrder(){
         return Arrays.asList(
-                new Order("1", "2", OrderStatus.COMPLETED, Arrays.asList("1", "2")),
-                new Order("2", "3", OrderStatus.COMPLETED, Arrays.asList("3", "4"))
+//                new Order("1", "2", OrderStatus.COMPLETED, Arrays.asList("1", "2")),
+//                new Order("2", "3", OrderStatus.COMPLETED, Arrays.asList("3", "4"))
         );
     }
 }

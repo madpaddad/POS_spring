@@ -46,11 +46,23 @@ public class OrderService {
     public Mono<ApiResponse<List<Document>>> get(String id) {
 
             Aggregation aggregation  = Aggregation.newAggregation(
+
+                    Aggregation.lookup("order", "order_id", "_id", "order_info"),
+                    Aggregation.unwind("order_info", true),
+
+//                    Aggregation.addFields()
+//                            .addField("orderStatus")
+//                            .withValue("$order_.orderStatus")
+//                            .addField("table")
+//                            .withValue("$order_.tableNo")
+//                            .build(),
+
                     Aggregation.lookup("product", "product_id", "_id", "product"),
                     Aggregation.unwind("product", true),
 
                     Aggregation.group("order_id")
                             .sum("total").as("total_price")
+                            .first("order_info.orderStatus").as("order_status")
                             .push(
                                     new BasicDBObject()
                                             .append("id", new BasicDBObject("$toString", "$_id"))
@@ -58,14 +70,7 @@ public class OrderService {
                                             .append("quantity", "$quantity")
                                             .append("total", "$total")
                             )
-                            .as("products"),
-
-                    Aggregation.lookup("order", "order_id", "_id", "order"),
-                    Aggregation.unwind("order", true),
-                    Aggregation.addFields()
-                            .addField("order_status")
-                            .withValue("$order.orderStatus")
-                            .build()
+                            .as("products")
             );
 
 
@@ -89,7 +94,7 @@ public class OrderService {
         return reactiveMongoTemplate
                 .insert(order)
                 .map(Order::getId)
-                .flatMap(id ->
+                .map(id ->
                 {
                     TableOrder tableorder = new TableOrder(table, id);
                     return reactiveMongoTemplate.insert(tableorder);

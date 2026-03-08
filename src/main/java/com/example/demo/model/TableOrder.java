@@ -1,5 +1,6 @@
 package com.example.demo.model;
 
+import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Field;
 
@@ -12,7 +13,7 @@ public class TableOrder {
     private String table;
 
     @Field
-    private String order;
+    private ObjectId order;
 
     public String getId() {
         return id;
@@ -30,17 +31,17 @@ public class TableOrder {
         this.table = table;
     }
 
-    public String getOrder() {
+    public ObjectId getOrder() {
         return order;
     }
 
-    public void setOrder(String order) {
+    public void setOrder(ObjectId order) {
         this.order = order;
     }
 
     public TableOrder(){}
 
-    public TableOrder(String table, String order){
+    public TableOrder(String table, ObjectId order){
         this.table = table;
         this.order = order;
     }

@@ -1,6 +1,7 @@
 package com.example.demo.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.bson.types.ObjectId;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
@@ -31,16 +32,16 @@ public class OrderItem {
 
     private String variant;
 
-    public String getOrder_id() {
+    public ObjectId getOrder_id() {
         return order_id;
     }
 
-    public void setOrder_id(String order_id) {
+    public void setOrder_id(ObjectId order_id) {
         this.order_id = order_id;
     }
 
     @Field
-    private String order_id;
+    private ObjectId order_id;
 
 //    @Transient
     @JsonIgnore
